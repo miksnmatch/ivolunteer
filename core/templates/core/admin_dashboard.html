@@ -1,0 +1,84 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard — Admin{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-banner">Dashboard</div>
+
+<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-users"></i></div>
+    <div><div class="stat-val">{{ total_users }}</div><div class="stat-label">Total Volunteer Users</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-building-user"></i></div>
+    <div><div class="stat-val">{{ active_orgs }}</div><div class="stat-label">Active Organizations</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
+    <div><div class="stat-val">{{ apps_this_week }}</div><div class="stat-label">Applications This Week</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon"><i class="fas fa-hand-holding-heart"></i></div>
+    <div><div class="stat-val">{{ active_opps }}</div><div class="stat-label">Active Opportunities</div></div>
+  </div>
+</div>
+
+{% if pending_verif or pending_org_verif %}
+<div class="alert alert-warning" style="margin-bottom:20px">
+  <i class="fas fa-clock"></i>
+  <span>
+    {% if pending_verif %}{{ pending_verif }} user verification{{ pending_verif|pluralize }} pending. {% endif %}
+    {% if pending_org_verif %}{{ pending_org_verif }} organization verification{{ pending_org_verif|pluralize }} pending.{% endif %}
+    <a href="{% url 'admin_verification' %}" style="color:#854d0e;font-weight:700;margin-left:8px">Review now →</a>
+  </span>
+</div>
+{% endif %}
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+  <!-- New Users -->
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <span style="font-weight:700;font-size:.95rem">New Users</span>
+        <a href="{% url 'admin_users' %}" class="btn btn-grey btn-sm">view all</a>
+      </div>
+      {% for u in new_users %}
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e5e5e5">
+        <div style="width:36px;height:36px;border-radius:50%;background:#4a7c5f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0;overflow:hidden">
+          {% if u.profile_picture %}<img src="{{ u.profile_picture.url }}" alt="" style="width:100%;height:100%;object-fit:cover">{% else %}{{ u.first_name|first|upper }}{% endif %}
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.875rem">{{ u.get_full_name|default:u.username }}</div>
+          <div style="font-size:.72rem;color:#888">{{ u.date_joined|date:"M d, Y" }}</div>
+        </div>
+        <a href="{% url 'admin_user_detail' u.pk %}" class="btn btn-green btn-sm">View Details</a>
+      </div>
+      {% empty %}
+      <div style="text-align:center;color:#888;font-size:.85rem;padding:16px">No users yet</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recent Reports -->
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <span style="font-weight:700;font-size:.95rem">Recent Reports</span>
+        <a href="{% url 'admin_reports' %}" class="btn btn-grey btn-sm">view all</a>
+      </div>
+      {% for r in recent_reports %}
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e5e5e5">
+        <div style="width:36px;height:36px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0"><i class="fas fa-flag"></i></div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.875rem">{% if r.reported_user %}{{ r.reported_user.get_full_name }}{% elif r.reported_org %}{{ r.reported_org.name }}{% endif %}</div>
+          <div style="font-size:.72rem;color:#888">{{ r.created_at|date:"M d, Y" }}</div>
+        </div>
+        <span class="badge badge-pending">Pending</span>
+      </div>
+      {% empty %}
+      <div style="text-align:center;color:#888;font-size:.85rem;padding:16px">No pending reports</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

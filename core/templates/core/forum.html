@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+{% block title %}Community Forum — iVolunteer{% endblock %}
+{% block page_title %}Community Forum{% endblock %}
+{% block content %}
+<div class="page-banner">Community Forum</div>
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+  <form method="get" style="display:flex;gap:10px;flex:1;max-width:600px">
+    <div class="search-wrap" style="flex:1">
+      <i class="fas fa-search"></i>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search posts…" class="form-control" style="padding-left:38px">
+    </div>
+    <select name="cat" class="form-control" style="width:170px">
+      <option value="">All Categories</option>
+      {% for val,label in categories %}<option value="{{ val }}" {% if cat == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="btn btn-green">Search</button>
+  </form>
+  <a href="{% url 'create_post' %}" class="btn btn-green" style="margin-left:12px"><i class="fas fa-plus"></i> New Post</a>
+</div>
+
+<div class="tabs">
+  <a href="?cat=&q={{ q }}" class="tab-btn {% if not cat %}active{% endif %}">All</a>
+  {% for val,label in categories %}<a href="?cat={{ val }}&q={{ q }}" class="tab-btn {% if cat == val %}active{% endif %}">{{ label }}</a>{% endfor %}
+</div>
+
+{% if page_obj.object_list %}
+{% for post in page_obj %}
+<div class="post-card">
+  <div class="post-author">
+    <div style="width:24px;height:24px;border-radius:50%;background:#4a7c5f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700">{{ post.author.first_name|first|upper }}</div>
+    {{ post.author.get_full_name|default:post.author.username }}
+    <span class="dot">·</span>
+    {{ post.created_at|timesince }} ago
+    <span class="dot">·</span>
+    <span class="badge badge-secondary" style="font-size:.65rem;padding:1px 7px;background:#f1f5f9;color:#475569">{{ post.get_category_display }}</span>
+  </div>
+  <a href="{% url 'post_detail' post.pk %}" class="post-title">{{ post.title }}</a>
+  <p class="post-excerpt">{{ post.content|truncatewords:25 }}</p>
+  <div class="post-actions">
+    <button onclick="likePost({{ post.pk }}, this)"><i class="fas fa-heart"></i> <span id="likes-{{ post.pk }}">{{ post.lc }}</span></button>
+    <span><i class="fas fa-comment"></i> {{ post.cc }} replies</span>
+    <a href="{% url 'post_detail' post.pk %}" style="color:#4a7c5f;font-size:.78rem;margin-left:auto">Read more →</a>
+  </div>
+</div>
+{% endfor %}
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&cat={{ cat }}&q={{ q }}" class="page-link"><i class="fas fa-chevron-left"></i></a>{% endif %}
+  {% for n in page_obj.paginator.page_range %}{% if n == page_obj.number %}<span class="page-link active">{{ n }}</span>{% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}<a href="?page={{ n }}&cat={{ cat }}&q={{ q }}" class="page-link">{{ n }}</a>{% endif %}{% endfor %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&cat={{ cat }}&q={{ q }}" class="page-link"><i class="fas fa-chevron-right"></i></a>{% endif %}
+</div>
+{% endif %}
+{% else %}
+<div class="empty-state"><i class="fas fa-comments"></i><h3>No posts yet</h3><p>Be the first to start a conversation!</p><a href="{% url 'create_post' %}" class="btn btn-green" style="margin-top:16px">Create Post</a></div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+function likePost(pk, btn) {
+  fetch(`/forum/${pk}/like/`, {method:'POST', headers:{'X-CSRFToken':'{{ csrf_token }}', 'Content-Type':'application/json'}})
+    .then(r=>r.json()).then(d=>{
+      document.getElementById('likes-'+pk).textContent = d.count;
+      btn.querySelector('i').style.color = d.liked?'#dc2626':'';
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard — iVolunteer{% endblock %}
+{% block page_title %}Home{% endblock %}
+{% block content %}
+<div class="page-banner">Dashboard</div>
+
+{% with u=request.user %}
+<div style="display:grid;grid-template-columns:1fr 300px;gap:24px">
+  <div>
+    <!-- Welcome card -->
+    <div class="card mb-4">
+      <div class="card-body" style="display:flex;align-items:center;gap:20px">
+        <div class="profile-avatar-lg" style="width:60px;height:60px;font-size:1.4rem;background:linear-gradient(135deg,#2d5a3d,#4a7c5f);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;overflow:hidden">
+          {% if u.profile_picture %}<img src="{{ u.profile_picture.url }}" alt="" style="width:100%;height:100%;object-fit:cover">
+          {% else %}{{ u.first_name|first|upper }}{{ u.last_name|first|upper }}{% endif %}
+        </div>
+        <div style="flex:1">
+          <div style="font-size:1.1rem;font-weight:800;color:#1a1a1a">Welcome back, {{ u.get_full_name|default:u.username }}! 👋</div>
+          <div style="font-size:.83rem;color:#888;margin-top:2px">{{ u.email }}</div>
+          {% if not u.is_verified %}
+          <div style="margin-top:8px">
+            <a href="{% url 'identity_verification' %}" class="btn btn-outline-green btn-sm"><i class="fas fa-shield-alt"></i> Verify Identity</a>
+          </div>
+          {% else %}
+          <div style="margin-top:8px;display:inline-flex;align-items:center;gap:5px;background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700">
+            <i class="fas fa-check-circle"></i> Verified
+          </div>
+          {% endif %}
+        </div>
+        <div style="display:flex;gap:24px;text-align:center">
+          <div><div style="font-size:1.4rem;font-weight:800;color:#4a7c5f">{{ profile.total_projects }}</div><div style="font-size:.72rem;color:#888">Projects</div></div>
+          <div><div style="font-size:1.4rem;font-weight:800;color:#4a7c5f">{{ profile.total_hours }}</div><div style="font-size:.72rem;color:#888">Hours</div></div>
+          <div><div style="font-size:1.4rem;font-weight:800;color:#4a7c5f">{{ profile.rating|floatformat:1 }}</div><div style="font-size:.72rem;color:#888">Rating</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Opportunities -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <h2 style="font-size:1rem;font-weight:700">Recommended Opportunities</h2>
+      <a href="{% url 'opportunities_list' %}" class="btn btn-grey btn-sm">View All <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    {% if opportunities %}
+    <div class="opp-grid">
+      {% for opp in opportunities %}
+      <div class="opp-card">
+        <div class="opp-card-img">
+          {% if opp.image %}<img src="{{ opp.image.url }}" alt="">
+          {% else %}
+          {% if opp.category == 'environmental' %}🌿{% elif opp.category == 'healthcare' %}🏥{% elif opp.category == 'education' %}📚{% elif opp.category == 'community' %}🤝{% elif opp.category == 'animal_care' %}🐾{% elif opp.category == 'disaster' %}🆘{% else %}❤️{% endif %}
+          {% endif %}
+        </div>
+        <div class="opp-card-body">
+          <div class="opp-card-cat">{{ opp.get_category_display }}</div>
+          <div class="opp-card-title">{{ opp.title }}</div>
+          <div class="opp-card-org"><i class="fas fa-building" style="color:#4a7c5f"></i> {{ opp.organization.name }}</div>
+          <div class="opp-card-meta">
+            <div><i class="fas fa-calendar"></i> {{ opp.date }}</div>
+            <div><i class="fas fa-map-marker-alt"></i> {{ opp.location }}</div>
+            <div><i class="fas fa-users"></i> {{ opp.spots_available }} spots left</div>
+          </div>
+        </div>
+        <div class="opp-card-footer">
+          {% if opp.pk in user_app_ids %}
+          <span class="badge badge-pending">Applied</span>
+          {% else %}
+          <span style="font-size:.75rem;color:#888">{{ opp.approved_count }}/{{ opp.max_volunteers }} joined</span>
+          {% endif %}
+          <a href="{% url 'opp_detail' opp.pk %}" class="btn btn-green btn-sm">View</a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state card"><div class="card-body"><i class="fas fa-search"></i><h3>No opportunities yet</h3><p>Check back later or <a href="{% url 'opportunities_list' %}" style="color:#4a7c5f">browse all</a></p></div></div>
+    {% endif %}
+  </div>
+
+  <!-- Right sidebar -->
+  <div>
+    <!-- Notifications -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font-weight:700;font-size:.9rem">Notifications</span>
+          <a href="{% url 'notifications' %}" style="font-size:.78rem;color:#4a7c5f">View all</a>
+        </div>
+        {% with notifs=u.notifications.all %}
+        {% if notifs %}
+          {% for n in notifs|slice:":4" %}
+          <div style="padding:9px 0;border-bottom:1px solid #e5e5e5;display:flex;gap:10px;align-items:flex-start">
+            <div style="width:30px;height:30px;border-radius:50%;background:#e8f5ee;color:#4a7c5f;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0">
+              <i class="fas fa-bell"></i>
+            </div>
+            <div>
+              <div style="font-size:.8rem;font-weight:600;color:#1a1a1a">{{ n.title }}</div>
+              <div style="font-size:.72rem;color:#888;margin-top:2px">{{ n.created_at|timesince }} ago</div>
+            </div>
+            {% if not n.is_read %}<div style="width:7px;height:7px;border-radius:50%;background:#4a7c5f;flex-shrink:0;margin-top:4px"></div>{% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <div style="text-align:center;padding:20px;color:#888;font-size:.83rem">No notifications</div>
+        {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+
+    <!-- Quick links -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:12px">Quick Actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="{% url 'opportunities_list' %}" class="btn btn-green btn-block"><i class="fas fa-search"></i> Find Opportunities</a>
+          <a href="{% url 'my_applications' %}" class="btn btn-outline-green btn-block"><i class="fas fa-clipboard-list"></i> My Applications</a>
+          <a href="{% url 'forum' %}" class="btn btn-grey btn-block"><i class="fas fa-comments"></i> Community Forum</a>
+          <a href="{% url 'vol_profile' %}" class="btn btn-grey btn-block"><i class="fas fa-user"></i> My Profile</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skills -->
+    {% if profile.skills %}
+    <div class="card">
+      <div class="card-body">
+        <div style="font-weight:700;font-size:.9rem;margin-bottom:10px">My Skills</div>
+        {% for skill in profile.skills_list %}
+        <span class="tag">{{ skill }}</span>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endwith %}
+{% endblock %}

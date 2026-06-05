@@ -1,0 +1,33 @@
+{% extends 'core/base.html' %}
+{% block title %}Manage Volunteers{% endblock %}
+{% block page_title %}Manage Volunteers{% endblock %}
+{% block content %}
+<div class="page-banner">Manage Volunteers</div>
+<div class="search-bar">
+  <form method="get" style="display:flex;gap:10px;flex:1">
+    <div class="search-wrap" style="flex:1"><i class="fas fa-search"></i><input type="text" name="q" value="{{ q }}" placeholder="Search by name or email…" class="form-control" style="padding-left:38px"></div>
+    <button type="submit" class="btn btn-green">Search</button>
+  </form>
+</div>
+{% if applications %}
+<div class="tbl-wrap card">
+  <table>
+    <thead><tr><th>Volunteer</th><th>Opportunity</th><th>Applied</th><th>Status</th><th>Rating</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for app in applications %}
+    <tr>
+      <td><div style="font-weight:600">{{ app.full_name }}</div><div style="font-size:.75rem;color:#888">{{ app.email }}</div></td>
+      <td style="font-size:.85rem">{{ app.opportunity.title|truncatechars:30 }}</td>
+      <td style="font-size:.8rem;color:#888">{{ app.applied_at|date:"M d, Y" }}</td>
+      <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+      <td>{% if app.completion_rating %}<span style="color:#f0a500">{{ app.completion_rating }}★</span>{% else %}<span style="color:#ccc">—</span>{% endif %}</td>
+      <td><a href="{% url 'applicant_detail' app.pk %}" class="btn btn-green btn-sm">View</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="empty-state"><i class="fas fa-user-check"></i><h3>No volunteers yet</h3><p>Post opportunities to start receiving applications.</p></div>
+{% endif %}
+{% endblock %}

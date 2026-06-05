@@ -1,0 +1,45 @@
+{% extends "core/base.html" %}
+
+{% block full_page %}
+<div class="auth-page">
+
+  <div class="auth-bg" style="background:linear-gradient(135deg,#2d5a3d,#4a7c5f,#6aab7f)">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center;padding:40px">
+      <div>
+        <h2 style="font-size:2rem;font-weight:800">Continue with Google</h2>
+        <p style="opacity:.8;margin-top:10px">
+          Redirecting you securely to Google
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-panel">
+    <div class="auth-inner">
+
+      <div class="auth-logo">
+        <span class="auth-logo-text">iVolunteer</span>
+      </div>
+
+      <p class="auth-sub">Google Sign-In</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit"
+          style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+          background:#fff;border:1px solid #ddd;padding:12px;border-radius:8px;font-weight:600;cursor:pointer">
+
+          <img src="https://www.svgrepo.com/show/355037/google.svg" width="18">
+          Continue with Google
+        </button>
+      </form>
+
+      <div class="auth-bottom">
+        <a href="/accounts/login/" class="auth-link">← Back</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

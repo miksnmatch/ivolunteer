@@ -1,0 +1,120 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ target.get_full_name }} — Admin{% endblock %}
+{% block page_title %}User Detail{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'admin_users' %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back to Users</a></div>
+<div style="display:grid;grid-template-columns:1fr 320px;gap:24px">
+  <div>
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="display:flex;align-items:flex-start;gap:16px;margin-bottom:20px">
+          <div style="width:64px;height:64px;border-radius:50%;background:#4a7c5f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;flex-shrink:0;overflow:hidden">
+            {% if target.profile_picture %}<img src="{{ target.profile_picture.url }}" alt="" style="width:100%;height:100%;object-fit:cover">{% else %}{{ target.first_name|first|upper }}{% endif %}
+          </div>
+          <div style="flex:1">
+            <h2 style="font-size:1.2rem;font-weight:800">{{ target.get_full_name|default:target.username }}</h2>
+            <div style="font-size:.83rem;color:#888;margin-top:2px">{{ target.email }}</div>
+            <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+              <span class="badge badge-{{ target.status }}">{{ target.get_status_display }}</span>
+              {% if target.is_verified %}<span class="badge badge-completed"><i class="fas fa-check-circle"></i> Verified</span>{% endif %}
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;font-size:.85rem">
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Phone</div><div>{{ target.phone_number|default:"—" }}</div></div>
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Location</div><div>{{ target.location|default:"—" }}</div></div>
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Joined</div><div>{{ target.date_joined|date:"M d, Y" }}</div></div>
+          {% if profile %}
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Projects</div><div style="font-weight:700;color:#4a7c5f">{{ profile.total_projects }}</div></div>
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Rating</div><div style="font-weight:700;color:#f0a500">{{ profile.rating|floatformat:1 }} ★</div></div>
+          {% endif %}
+        </div>
+        {% if profile and profile.skills %}
+        <div style="margin-top:14px"><div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:6px">Skills</div>{% for s in profile.skills_list %}<span class="tag">{{ s }}</span>{% endfor %}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Certificates -->
+    {% if certs %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <h3 style="font-weight:700;font-size:.95rem">Certificates</h3>
+          <a href="{% url 'create_certificate' target.pk %}" class="btn btn-green btn-sm"><i class="fas fa-plus"></i> Issue Certificate</a>
+        </div>
+        {% for cert in certs %}
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e5e5e5">
+          <div style="width:36px;height:36px;border-radius:50%;background:#2d5a3d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0"><i class="fas fa-certificate"></i></div>
+          <div style="flex:1"><div style="font-weight:600;font-size:.85rem">{{ cert.template_title }}</div><div style="font-size:.75rem;color:#888">{{ cert.get_cert_type_display }} · {{ cert.issued_at|date:"M d, Y" }}</div></div>
+          <a href="{% url 'view_certificate' cert.pk %}" class="btn btn-grey btn-sm">View</a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% else %}
+    <div class="card mb-4">
+      <div class="card-body" style="display:flex;align-items:center;justify-content:space-between">
+        <span style="color:#888;font-size:.875rem">No certificates issued yet.</span>
+        <a href="{% url 'create_certificate' target.pk %}" class="btn btn-green btn-sm"><i class="fas fa-plus"></i> Issue Certificate</a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Warning History -->
+    {% if warnings %}
+    <div class="card">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:14px;font-size:.95rem">Warning History</h3>
+        {% for w in warnings %}
+        <div style="padding:10px;background:#fff9f9;border-left:3px solid #dc2626;border-radius:4px;margin-bottom:8px">
+          <div style="display:flex;justify-content:space-between"><span style="font-weight:600;font-size:.85rem">{{ w.reason }}</span><span style="font-size:.72rem;color:#888">{{ w.created_at|date:"M d, Y" }}</span></div>
+          {% if w.description %}<div style="font-size:.8rem;color:#555;margin-top:3px">{{ w.description }}</div>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div>
+    <!-- Admin Actions -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="font-weight:700;margin-bottom:14px;font-size:.95rem">Admin Actions</div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group"><label class="form-label">Reason</label><input type="text" name="reason" class="form-control" placeholder="Reason for action…"></div>
+          <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="3" placeholder="Details…"></textarea></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button name="action" value="warning" class="btn btn-warning-outline btn-block"><i class="fas fa-exclamation-triangle"></i> Issue Warning</button>
+            <div style="display:flex;gap:8px">
+              <input type="number" name="suspension_days" class="form-control" value="7" min="1" style="width:80px;flex-shrink:0">
+              <button name="action" value="suspend" class="btn btn-danger btn-block"><i class="fas fa-ban"></i> Suspend</button>
+            </div>
+            {% if target.status == 'suspended' %}
+            <button name="action" value="activate" class="btn btn-outline-green btn-block"><i class="fas fa-check-circle"></i> Activate Account</button>
+            {% endif %}
+            <button name="action" value="delete" class="btn btn-danger btn-block" onclick="return confirm('Delete this user? Cannot be undone.')"><i class="fas fa-trash"></i> Delete Account</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Reports received -->
+    {% if reports %}
+    <div class="card">
+      <div class="card-body">
+        <div style="font-weight:700;margin-bottom:12px;font-size:.9rem">Reports Against User</div>
+        {% for r in reports|slice:":5" %}
+        <div style="padding:8px 0;border-bottom:1px solid #e5e5e5;font-size:.83rem">
+          <div style="font-weight:600">{{ r.reason }}</div>
+          <div style="color:#888;font-size:.75rem;margin-top:2px">{{ r.created_at|date:"M d, Y" }} — <span class="badge badge-{{ r.status }}" style="font-size:.65rem">{{ r.get_status_display }}</span></div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

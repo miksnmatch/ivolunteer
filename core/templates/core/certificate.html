@@ -1,0 +1,32 @@
+{% extends 'core/base.html' %}
+{% block title %}Certificate — {{ cert.user.get_full_name }}{% endblock %}
+{% block page_title %}Certificate{% endblock %}
+{% block content %}
+<div style="text-align:center;margin-bottom:16px">
+  <button onclick="window.print()" class="btn btn-green"><i class="fas fa-print"></i> Print Certificate</button>
+</div>
+<div class="cert-wrap">
+  <div class="cert-icon"><i class="fas fa-award"></i></div>
+  <div class="cert-type">{{ cert.get_cert_type_display }}</div>
+  <div class="cert-certifies">This certifies that</div>
+  <div class="cert-name">{{ cert.user.get_full_name }}</div>
+  <div class="cert-for">Has successfully completed volunteer service{% if cert.organization %} for{% endif %}</div>
+  {% if cert.organization %}<div class="cert-org">{{ cert.organization.name }}</div>{% endif %}
+  {% if cert.template_title %}<div style="font-size:.95rem;color:#555;margin:8px 0;font-style:italic">"{{ cert.template_title }}"</div>{% endif %}
+  {% if cert.hours %}<div class="cert-hours">Contributing <strong>{{ cert.hours }} hours</strong> of dedicated service</div>{% endif %}
+  <div style="margin-top:32px;display:flex;justify-content:space-around">
+    <div style="text-align:center">
+      <div style="border-top:1.5px solid #1a1a1a;padding-top:8px;min-width:160px;margin-top:32px">
+        <div style="font-weight:700;font-size:.875rem">{{ cert.issued_by }}</div>
+        <div style="font-size:.75rem;color:#888">{{ cert.issued_role }}</div>
+      </div>
+    </div>
+    <div style="text-align:center">
+      <div style="border-top:1.5px solid #1a1a1a;padding-top:8px;min-width:160px;margin-top:32px">
+        <div style="font-weight:700;font-size:.875rem">{{ cert.issued_at|date:"F j, Y" }}</div>
+        <div style="font-size:.75rem;color:#888">Date Issued</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

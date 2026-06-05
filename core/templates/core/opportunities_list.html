@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Find Opportunities — iVolunteer{% endblock %}
+{% block page_title %}Find Opportunities{% endblock %}
+{% block content %}
+<div class="page-banner">Find Opportunities</div>
+
+<div class="search-bar">
+  <form method="get" style="display:flex;gap:10px;flex:1">
+    <div class="search-wrap" style="flex:1">
+      <i class="fas fa-search"></i>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by title, location…" class="form-control" style="padding-left:38px">
+    </div>
+    <select name="cat" class="form-control" style="width:200px">
+      <option value="">All Categories</option>
+      {% for val,label in categories %}
+      <option value="{{ val }}" {% if cat == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-green">Search</button>
+    {% if q or cat %}<a href="{% url 'opportunities_list' %}" class="btn btn-grey">Clear</a>{% endif %}
+  </form>
+</div>
+
+{% if page_obj.object_list %}
+<div style="font-size:.83rem;color:#888;margin-bottom:14px">{{ page_obj.paginator.count }} opportunit{{ page_obj.paginator.count|pluralize:"y,ies" }} found</div>
+<div class="opp-grid">
+  {% for opp in page_obj %}
+  <div class="opp-card">
+    <div class="opp-card-img">
+      {% if opp.image %}<img src="{{ opp.image.url }}" alt="">
+      {% else %}
+      {% if opp.category == 'environmental' %}🌿{% elif opp.category == 'healthcare' %}🏥{% elif opp.category == 'education' %}📚{% elif opp.category == 'community' %}🤝{% elif opp.category == 'animal_care' %}🐾{% elif opp.category == 'disaster' %}🆘{% else %}❤️{% endif %}
+      {% endif %}
+    </div>
+    <div class="opp-card-body">
+      <div class="opp-card-cat">{{ opp.get_category_display }}</div>
+      <div class="opp-card-title">{{ opp.title }}</div>
+      <div class="opp-card-org"><i class="fas fa-building"></i> <a href="{% url 'public_org_profile' opp.organization.pk %}" style="color:#4a7c5f">{{ opp.organization.name }}</a></div>
+      <div class="opp-card-meta">
+        <div><i class="fas fa-calendar"></i> {{ opp.date }}</div>
+        <div><i class="fas fa-clock"></i> {{ opp.start_time }} – {{ opp.end_time }}</div>
+        <div><i class="fas fa-map-marker-alt"></i> {{ opp.location }}</div>
+        <div><i class="fas fa-users"></i> {{ opp.spots_available }} spots available</div>
+      </div>
+    </div>
+    <div class="opp-card-footer">
+      {% if opp.pk in user_app_ids %}
+      <span class="badge badge-pending">Applied</span>
+      {% else %}
+      <span style="font-size:.75rem;color:#888">{{ opp.approved_count }}/{{ opp.max_volunteers }}</span>
+      {% endif %}
+      <a href="{% url 'opp_detail' opp.pk %}" class="btn btn-green btn-sm">View Details</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&cat={{ cat }}" class="page-link"><i class="fas fa-chevron-left"></i></a>{% endif %}
+  {% for n in page_obj.paginator.page_range %}
+    {% if n == page_obj.number %}<span class="page-link active">{{ n }}</span>
+    {% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}<a href="?page={{ n }}&q={{ q }}&cat={{ cat }}" class="page-link">{{ n }}</a>{% endif %}
+  {% endfor %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ q }}&cat={{ cat }}" class="page-link"><i class="fas fa-chevron-right"></i></a>{% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-search"></i>
+  <h3>No opportunities found</h3>
+  <p>Try adjusting your search or <a href="{% url 'opportunities_list' %}" style="color:#4a7c5f">clear filters</a></p>
+</div>
+{% endif %}
+{% endblock %}

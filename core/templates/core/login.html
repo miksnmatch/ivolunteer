@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% block full_page %}
+<div class="auth-page">
+  <div class="auth-bg" style="background:linear-gradient(135deg,#2d5a3d 0%,#4a7c5f 50%,#6aab7f 100%)">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;z-index:1;padding:40px">
+      <div style="text-align:center;max-width:400px">
+        <div style="width:72px;height:72px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem">🤝</div>
+        <h2 style="font-size:2rem;font-weight:800;margin-bottom:12px">Connect. Volunteer. Impact.</h2>
+        <p style="opacity:.8;line-height:1.6">Join thousands of volunteers making a difference in their communities every day.</p>
+        <div style="margin-top:32px;display:flex;flex-direction:column;gap:10px;text-align:left">
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.12);border-radius:10px;padding:12px 16px">
+            <span style="font-size:1.2rem">🔍</span><span style="font-size:.875rem">Find volunteer opportunities near you</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.12);border-radius:10px;padding:12px 16px">
+            <span style="font-size:1.2rem">🏆</span><span style="font-size:.875rem">Earn certificates &amp; achievements</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.12);border-radius:10px;padding:12px 16px">
+            <span style="font-size:1.2rem">🌍</span><span style="font-size:.875rem">Build community &amp; change lives</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="auth-panel">
+    <div class="auth-inner">
+      <div class="auth-logo">
+        <svg width="32" height="32" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#4a7c5f"/><path d="M12 26c0-4 3-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="15" r="4" fill="#fff"/></svg>
+        <span class="auth-logo-text">iVolunteer</span>
+      </div>
+      <p class="auth-sub">Log in to your account</p>
+      {% for message in messages %}
+      <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>
+      {% endfor %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="text" name="email" class="form-control" placeholder="Enter your email" autofocus required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" style="display:flex;justify-content:space-between">
+            Password <a href="{% url 'forgot_password' %}" class="auth-link" style="font-size:.78rem">Forgot Password?</a>
+          </label>
+          <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-green btn-block btn-lg" style="margin-top:4px">Login</button>
+          <div style="margin-top:15px;text-align:center">
+          <p style="margin:10px 0;color:#666;font-size:.9rem">or</p>
+
+{% load socialaccount %}
+
+<a href="{% provider_login_url 'google' %}"
+   style="display:flex;align-items:center;justify-content:center;gap:10px;
+          background:#fff;border:1px solid #ddd;padding:10px;border-radius:8px;
+          text-decoration:none;font-weight:500;color:#333">
+  <img src="https://www.svgrepo.com/show/355037/google.svg" width="18">
+  Continue with Google
+</a>
+        </div>
+      </form>
+      <div class="auth-bottom">
+        Not an admin? &nbsp;
+        <a href="{% url 'register_volunteer' %}" class="auth-link">Volunteer Sign Up</a> &nbsp;|&nbsp;
+        <a href="{% url 'register_organization' %}" class="auth-link">Org Sign Up</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

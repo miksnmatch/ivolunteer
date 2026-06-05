@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+{% block title %}Report #{{ report.pk }} — Admin{% endblock %}
+{% block page_title %}Report Detail{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'admin_reports' %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back to Reports</a></div>
+<div style="max-width:680px">
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-size:1.1rem;font-weight:800">Report Details — #RPT{{ report.pk|stringformat:"03d" }}</h2>
+        <a href="{% url 'admin_reports' %}" style="color:#888"><i class="fas fa-times"></i></a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;font-size:.875rem">
+        <div><span style="color:#888;font-weight:600">Reported {% if report.reported_user %}User{% else %}Organization{% endif %}:</span> <span style="margin-left:8px;font-weight:600">{% if report.reported_user %}{{ report.reported_user.get_full_name }}{% elif report.reported_org %}{{ report.reported_org.name }}{% endif %}</span></div>
+        <div><span style="color:#888;font-weight:600">Reported By:</span> <span style="margin-left:8px">{{ report.reporter.get_full_name|default:report.reporter.username }}</span></div>
+        <div><span style="color:#888;font-weight:600">Reason:</span> <span style="margin-left:8px">{{ report.reason }}</span></div>
+        <div><span style="color:#888;font-weight:600">Date Reported:</span> <span style="margin-left:8px">{{ report.created_at|date:"F j, Y" }}</span></div>
+      </div>
+      {% if report.description %}
+      <div style="margin-bottom:20px">
+        <div style="font-size:.83rem;font-weight:700;color:#1a1a1a;margin-bottom:8px">Description:</div>
+        <p style="font-size:.875rem;color:#555;line-height:1.7;background:#f8faf8;border-radius:8px;padding:14px">{{ report.description }}</p>
+      </div>
+      {% endif %}
+      {% if report.evidence %}
+      <div style="margin-bottom:20px">
+        <div style="font-size:.83rem;font-weight:700;color:#1a1a1a;margin-bottom:10px">Evidence:</div>
+        <a href="{{ report.evidence.url }}" target="_blank" class="btn btn-grey btn-sm"><i class="fas fa-file"></i> View Evidence</a>
+      </div>
+      {% endif %}
+
+      {% if report.status == 'pending' %}
+      <div style="border-top:1px solid #e5e5e5;padding-top:20px">
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group"><label class="form-label">Action Taken <span style="color:#888;font-weight:400">(for resolve)</span></label><textarea name="action_taken" class="form-control" rows="3" placeholder="Describe what action was taken…"></textarea></div>
+          <div style="display:flex;gap:10px">
+            <button name="action" value="resolve" class="btn btn-outline-green btn-lg"><i class="fas fa-check-circle"></i> Mark as Done</button>
+            <button name="action" value="done" class="btn btn-green btn-lg"><i class="fas fa-check"></i> Resolve</button>
+            <button name="action" value="dismiss" class="btn btn-grey btn-lg"><i class="fas fa-ban"></i> Dismiss Report</button>
+          </div>
+        </form>
+      </div>
+      {% else %}
+      <div class="alert alert-{% if report.status == 'resolved' %}success{% else %}info{% endif %}" style="margin-top:16px">
+        <i class="fas fa-{% if report.status == 'resolved' %}check-circle{% else %}info-circle{% endif %}"></i>
+        Report {{ report.get_status_display|lower }} on {{ report.resolved_at|date:"M d, Y" }}.
+        {% if report.action_taken %}<br><strong>Action taken:</strong> {{ report.action_taken }}{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

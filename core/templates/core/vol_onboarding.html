@@ -1,0 +1,61 @@
+{% extends 'core/base.html' %}
+{% block full_page %}
+<div style="min-height:100vh;background:#f4f6f4;display:flex;align-items:center;justify-content:center;padding:40px 20px">
+  <div style="background:#fff;border-radius:16px;border:1px solid #e5e5e5;padding:40px;max-width:560px;width:100%;box-shadow:0 4px 16px rgba(0,0,0,.08)">
+    <div style="text-align:center;margin-bottom:28px">
+      <svg width="48" height="48" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#4a7c5f"/><path d="M12 26c0-4 3-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="15" r="4" fill="#fff"/></svg>
+      <h2 style="font-size:1.4rem;font-weight:800;margin-top:12px;color:#1a1a1a">Complete Your Profile</h2>
+      <p style="color:#888;font-size:.875rem;margin-top:4px">Help us match you with the best opportunities</p>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Date of Birth</label>
+          <input type="date" name="dob" class="form-control">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location / City</label>
+          <input type="text" name="location" class="form-control" placeholder="e.g., Manila, NCR">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Time Availability</label>
+        <select name="time_available" class="form-control">
+          <option value="">Select availability…</option>
+          <option value="weekdays">Weekdays</option>
+          <option value="weekends">Weekends</option>
+          <option value="both">Both Weekdays &amp; Weekends</option>
+          <option value="flexible">Flexible</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Skills <span style="color:#888;font-weight:400">(comma-separated)</span></label>
+        <input type="text" name="skills" class="form-control" placeholder="e.g., Teaching, First Aid, Photography">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interests</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
+          {% for val,label in categories %}
+          <label style="display:flex;align-items:center;gap:8px;padding:9px 12px;border:1.5px solid #e5e5e5;border-radius:8px;cursor:pointer;font-size:.85rem;transition:.15s" onmouseover="this.style.borderColor='#4a7c5f'" onmouseout="this.style.borderColor=this.querySelector('input').checked?'#4a7c5f':'#e5e5e5'">
+            <input type="checkbox" name="interests" value="{{ val }}" style="accent-color:#4a7c5f"> {{ label }}
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-green btn-block btn-lg" style="margin-top:8px">Save &amp; Continue <i class="fas fa-arrow-right"></i></button>
+      <a href="{% url 'vol_dashboard' %}" style="display:block;text-align:center;margin-top:12px;font-size:.83rem;color:#888">Skip for now</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+  cb.addEventListener('change',()=>{
+    cb.closest('label').style.borderColor = cb.checked?'#4a7c5f':'#e5e5e5';
+    cb.closest('label').style.background = cb.checked?'#e8f5ee':'#fff';
+  });
+});
+</script>
+{% endblock %}

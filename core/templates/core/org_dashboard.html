@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard — {{ org.name }}{% endblock %}
+{% block page_title %}Home{% endblock %}
+{% block content %}
+<div class="page-banner">Dashboard</div>
+<div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div><div class="stat-val">{{ org.total_events }}</div><div class="stat-label">Total Events</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div><div class="stat-val">{{ org.total_volunteers }}</div><div class="stat-label">Total Volunteers</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div><div class="stat-val">{{ org.total_hours }}</div><div class="stat-label">Volunteer Hours</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div><div class="stat-val">{{ org.rating|floatformat:1 }}</div><div class="stat-label">Avg. Rating</div></div></div>
+</div>
+
+{% if not org.is_verified %}
+<div class="alert alert-warning" style="margin-bottom:24px"><i class="fas fa-clock"></i> Your organization account is currently under review. You can still post opportunities while waiting for approval.</div>
+{% endif %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+  <h2 style="font-size:1rem;font-weight:700">My Opportunities</h2>
+  <a href="{% url 'create_opp' %}" class="btn btn-green"><i class="fas fa-plus"></i> Post New Opportunity</a>
+</div>
+
+{% if opportunities %}
+<div style="display:flex;flex-direction:column;gap:12px">
+{% for opp in opportunities %}
+<div class="card">
+  <div class="card-body" style="display:flex;align-items:center;gap:18px">
+    <div style="width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,#2d5a3d,#4a7c5f);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
+      {% if opp.category == 'environmental' %}🌿{% elif opp.category == 'healthcare' %}🏥{% elif opp.category == 'education' %}📚{% elif opp.category == 'community' %}🤝{% elif opp.category == 'animal_care' %}🐾{% elif opp.category == 'disaster' %}🆘{% else %}❤️{% endif %}
+    </div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:.97rem">{{ opp.title }}</div>
+      <div style="font-size:.78rem;color:#888;margin-top:2px"><i class="fas fa-calendar" style="color:#4a7c5f"></i> {{ opp.date }} &nbsp;·&nbsp; <i class="fas fa-map-marker-alt" style="color:#4a7c5f"></i> {{ opp.location }}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:20px">
+      <div style="text-align:center"><div style="font-weight:700;font-size:1.1rem;color:#4a7c5f">{{ opp.pending_count }}</div><div style="font-size:.7rem;color:#888">Pending</div></div>
+      <div style="text-align:center"><div style="font-weight:700;font-size:1.1rem;color:#4a7c5f">{{ opp.approved_count }}</div><div style="font-size:.7rem;color:#888">Approved</div></div>
+      <span class="badge badge-{{ opp.status }}">{{ opp.get_status_display }}</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="{% url 'org_applicants' opp.pk %}" class="btn btn-green btn-sm">Applicants</a>
+      <a href="{% url 'edit_opp' opp.pk %}" class="btn btn-grey btn-sm"><i class="fas fa-edit"></i></a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state card"><div class="card-body"><i class="fas fa-calendar-plus"></i><h3>No opportunities yet</h3><p>Post your first volunteer opportunity</p><a href="{% url 'create_opp' %}" class="btn btn-green" style="margin-top:16px">Post Opportunity</a></div></div>
+{% endif %}
+{% endblock %}

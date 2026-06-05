@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}iVolunteer{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{
+  --green:#4a7c5f;--green-dark:#2d5a3d;--green-mid:#3d6b50;--green-light:#e8f5ee;
+  --green-btn:#4a7c5f;--accent:#f0a500;
+  --sidebar-bg:#fff;--sidebar-w:240px;
+  --text:#1a1a1a;--text-2:#555;--text-3:#888;
+  --bg:#f4f6f4;--white:#fff;
+  --border:#e5e5e5;--border-2:#d0d0d0;
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 2px 8px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font-family:inherit}
+img{max-width:100%}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:var(--sidebar-w);background:var(--white);border-right:1px solid var(--border);position:fixed;top:0;left:0;bottom:0;display:flex;flex-direction:column;overflow-y:auto;z-index:200}
+.sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.sidebar-logo img{width:36px;height:36px}
+.sidebar-logo-text{font-size:1.15rem;font-weight:800;color:var(--green-dark)}
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:var(--text-2);font-size:.875rem;font-weight:500;cursor:pointer;transition:.15s;border-left:3px solid transparent;margin:1px 0}
+.nav-item i{width:18px;text-align:center;color:var(--text-3);font-size:.9rem}
+.nav-item:hover{background:#f8faf8;color:var(--green-dark)}
+.nav-item:hover i{color:var(--green)}
+.nav-item.active{background:var(--green-light);color:var(--green-dark);font-weight:600;border-left-color:var(--green)}
+.nav-item.active i{color:var(--green)}
+.nav-logout{color:#e55;margin-top:auto}
+.nav-logout i{color:#e55}
+.nav-logout:hover{background:#fff5f5;color:#c33}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.sidebar-user{display:flex;align-items:center;gap:10px}
+.s-avatar{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0;overflow:hidden}
+.s-avatar img{width:100%;height:100%;object-fit:cover}
+.s-user-name{font-size:.8rem;font-weight:600;color:var(--text)}
+.s-user-role{font-size:.7rem;color:var(--text-3)}
+
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.topbar-title{font-size:1rem;font-weight:700;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;color:var(--text-2);cursor:pointer;transition:.15s;position:relative}
+.icon-btn:hover{background:var(--bg);color:var(--green)}
+.badge-dot{position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:#e55;border-radius:50%;border:2px solid #fff}
+
+/* PAGE HEADER BANNER — matches the design's green banner */
+.page-banner{background:var(--green-mid);color:#fff;border-radius:var(--radius);padding:18px 28px;margin-bottom:24px;text-align:center;font-size:1.4rem;font-weight:700;letter-spacing:.01em}
+
+.content{padding:24px 28px;flex:1;max-width:1180px;width:100%}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow)}
+.card-body{padding:20px 24px}
+.card-title{font-size:.95rem;font-weight:700;margin-bottom:16px}
+
+/* ── STAT CARDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:24px;display:flex;align-items:center;gap:16px;box-shadow:var(--shadow)}
+.stat-icon{width:52px;height:52px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-size:1.3rem;color:var(--green);flex-shrink:0}
+.stat-val{font-size:1.8rem;font-weight:800;color:var(--text);line-height:1}
+.stat-label{font-size:.78rem;color:var(--text-3);margin-top:3px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:8px;font-size:.85rem;font-weight:600;cursor:pointer;border:none;transition:.15s;line-height:1.3}
+.btn-green{background:var(--green-btn);color:#fff}
+.btn-green:hover{background:var(--green-dark)}
+.btn-outline-green{background:transparent;border:1.5px solid var(--green);color:var(--green)}
+.btn-outline-green:hover{background:var(--green);color:#fff}
+.btn-grey{background:#f0f0f0;color:var(--text-2);border:1px solid var(--border)}
+.btn-grey:hover{background:var(--border)}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-warning-outline{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 13px;font-size:.78rem}
+.btn-block{width:100%;justify-content:center}
+.btn-lg{padding:12px 24px;font-size:.95rem}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:.78rem;font-weight:600;color:var(--text-2);margin-bottom:5px}
+.form-control{width:100%;padding:9px 13px;border:1.5px solid var(--border-2);border-radius:var(--radius-sm);font-size:.875rem;color:var(--text);background:var(--white);outline:none;transition:.15s}
+.form-control:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(74,124,95,.1)}
+textarea.form-control{resize:vertical;min-height:88px}
+select.form-control{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23888' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{padding:11px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);border-bottom:1px solid var(--border);white-space:nowrap}
+tbody td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:.875rem;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#fafcfa}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;text-transform:capitalize}
+.badge-active,.badge-approved{background:#d1fae5;color:#065f46}
+.badge-pending{background:#fef9c3;color:#854d0e}
+.badge-suspended,.badge-rejected{background:#fee2e2;color:#991b1b}
+.badge-inactive{background:#f1f5f9;color:#475569}
+.badge-completed{background:#dbeafe;color:#1e40af}
+
+/* ── ALERT ── */
+.alert{padding:11px 15px;border-radius:var(--radius-sm);font-size:.85rem;margin-bottom:14px;display:flex;align-items:flex-start;gap:9px}
+.alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+.alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.alert-info{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.alert-warning{background:#fef9c3;color:#854d0e;border:1px solid #fde047}
+
+/* ── USER / ORG CARDS (admin users page) ── */
+.user-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.user-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:20px;box-shadow:var(--shadow)}
+.user-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.user-card-avatar{width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;overflow:hidden;flex-shrink:0}
+.user-card-avatar img{width:100%;height:100%;object-fit:cover}
+.user-card-name{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:2px}
+.user-card-sub{font-size:.78rem;color:var(--text-3)}
+.user-card-info{display:flex;flex-direction:column;gap:5px;margin:12px 0;font-size:.8rem;color:var(--text-2)}
+.user-card-info .row{display:flex;align-items:center;gap:7px}
+.user-card-info i{color:var(--green);width:14px;text-align:center}
+.user-card-date{font-size:.72rem;color:var(--text-3);margin-bottom:8px}
+
+/* ── ORG LIST CARDS (admin orgs) ── */
+.org-list-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:18px 22px;margin-bottom:12px;display:flex;align-items:flex-start;gap:16px;box-shadow:var(--shadow)}
+.org-list-logo{width:52px;height:52px;border-radius:50%;background:var(--green-light);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;color:var(--green);flex-shrink:0;overflow:hidden}
+.org-list-logo img{width:100%;height:100%;object-fit:cover}
+.org-list-body{flex:1}
+.org-list-name{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:10px}
+.org-list-desc{font-size:.8rem;color:var(--text-2);margin:4px 0 10px;line-height:1.4}
+.org-list-meta{display:flex;flex-wrap:wrap;gap:14px;font-size:.78rem;color:var(--text-2)}
+.org-list-meta span{display:flex;align-items:center;gap:5px}
+.org-list-meta i{color:var(--green)}
+
+/* ── OPPORTUNITY CARDS ── */
+.opp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.opp-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow);transition:.2s;display:flex;flex-direction:column}
+.opp-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.opp-card-img{height:150px;background:linear-gradient(135deg,var(--green-dark),var(--green));display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:2.5rem;color:rgba(255,255,255,.5)}
+.opp-card-img img{width:100%;height:100%;object-fit:cover}
+.opp-card-body{padding:14px 16px;flex:1}
+.opp-card-cat{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--green);margin-bottom:4px}
+.opp-card-title{font-size:.95rem;font-weight:700;margin-bottom:8px;line-height:1.3}
+.opp-card-org{font-size:.75rem;color:var(--text-3);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.opp-card-meta{display:flex;flex-direction:column;gap:4px;font-size:.75rem;color:var(--text-2)}
+.opp-card-meta i{color:var(--green);width:13px}
+.opp-card-footer{padding:11px 16px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+
+/* ── SEARCH BAR ── */
+.search-bar{display:flex;gap:10px;margin-bottom:20px;align-items:center}
+.search-wrap{position:relative;flex:1}
+.search-wrap input{width:100%;padding:9px 13px 9px 38px;border:1.5px solid var(--border-2);border-radius:var(--radius-sm);font-size:.875rem;outline:none}
+.search-wrap input:focus{border-color:var(--green)}
+.search-wrap i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-3);font-size:.85rem}
+
+/* ── VERIFICATION CARDS ── */
+.verif-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.verif-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow)}
+.verif-card-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.verif-avatar{width:46px;height:46px;border-radius:50%;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem}
+.verif-name{font-weight:700;font-size:.95rem}
+.verif-id{font-size:.72rem;color:var(--text-3)}
+.verif-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.78rem;margin-bottom:12px}
+.verif-info .k{color:var(--text-3)}
+.verif-info .v{color:var(--text);font-weight:500}
+.verif-date{font-size:.72rem;color:var(--text-3);margin-bottom:12px}
+
+/* ── REPORT CARDS ── */
+.report-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.report-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:18px;box-shadow:var(--shadow)}
+.report-card .badge-pending{background:#fef9c3;color:#854d0e}
+.report-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.report-id{font-size:.7rem;color:var(--text-3);font-weight:600}
+.report-name{font-size:1rem;font-weight:700;margin-bottom:3px}
+.report-reason{font-size:.78rem;color:var(--text-2)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab-btn{padding:10px 20px;font-size:.85rem;font-weight:600;color:var(--text-3);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab-btn.active{color:var(--green-dark);border-bottom-color:var(--green)}
+.tab-btn:hover{color:var(--green)}
+
+/* ── AUTH ── */
+.auth-page{min-height:100vh;display:flex;align-items:stretch}
+.auth-bg{flex:1;background-size:cover;background-position:center;position:relative}
+.auth-bg::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.35)}
+.auth-panel{width:460px;background:var(--white);display:flex;align-items:center;justify-content:center;padding:40px;flex-shrink:0}
+.auth-inner{width:100%;max-width:380px}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.auth-logo-text{font-size:1.3rem;font-weight:800;color:var(--green-dark)}
+.auth-title{font-size:1.5rem;font-weight:800;color:var(--text);margin-bottom:4px}
+.auth-sub{font-size:.83rem;color:var(--text-3);margin-bottom:24px}
+.auth-link{color:var(--green);font-weight:600}
+.auth-bottom{text-align:center;margin-top:18px;font-size:.83rem;color:var(--text-3)}
+
+/* ── DETAIL PAGE ── */
+.detail-grid{display:grid;grid-template-columns:1fr 340px;gap:24px}
+.detail-main .detail-header{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.detail-sidebar .card{margin-bottom:16px}
+.detail-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text-3);margin-bottom:6px}
+.detail-value{font-size:.9rem;color:var(--text);font-weight:500}
+
+/* ── PROFILE ── */
+.profile-hero{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:var(--radius);padding:28px 32px;color:#fff;display:flex;align-items:center;gap:24px;margin-bottom:24px}
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;border:3px solid rgba(255,255,255,.4);flex-shrink:0;overflow:hidden}
+.profile-avatar-lg img{width:100%;height:100%;object-fit:cover}
+.profile-name{font-size:1.4rem;font-weight:800;margin-bottom:2px}
+.profile-email{opacity:.8;font-size:.85rem}
+.profile-tag{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:4px 12px;font-size:.72rem;font-weight:600;margin-top:8px}
+
+/* ── IMPACT NUMBERS ── */
+.impact-row{display:flex;gap:32px;text-align:center;padding:16px 0}
+.impact-num{font-size:1.5rem;font-weight:800;color:var(--green)}
+.impact-lbl{font-size:.72rem;color:var(--text-3);margin-top:2px}
+
+/* ── FORUM ── */
+.post-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:18px 20px;margin-bottom:12px;box-shadow:var(--shadow)}
+.post-author{font-size:.75rem;color:var(--text-3);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.post-author .dot{color:var(--border-2)}
+.post-title{font-size:.97rem;font-weight:700;margin-bottom:6px;color:var(--text)}
+.post-excerpt{font-size:.83rem;color:var(--text-2);line-height:1.5;margin-bottom:10px}
+.post-actions{display:flex;align-items:center;gap:14px;font-size:.78rem;color:var(--text-3)}
+.post-actions button{background:none;border:none;cursor:pointer;color:var(--text-3);display:flex;align-items:center;gap:5px;font-size:.78rem;transition:.15s}
+.post-actions button:hover{color:var(--green)}
+
+/* ── CHAT ── */
+.chat-layout{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - 108px);border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--white)}
+.chat-list{border-right:1px solid var(--border);overflow-y:auto}
+.chat-list-header{padding:14px 16px;font-weight:700;border-bottom:1px solid var(--border);font-size:.9rem}
+.chat-item{padding:13px 16px;display:flex;gap:11px;cursor:pointer;border-bottom:1px solid var(--border);transition:.1s}
+.chat-item:hover,.chat-item.active{background:#f8fbf8}
+.chat-av{width:40px;height:40px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
+.chat-name{font-weight:600;font-size:.85rem}
+.chat-preview{font-size:.75rem;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.chat-main{display:flex;flex-direction:column}
+.chat-header{padding:14px 18px;border-bottom:1px solid var(--border);font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:10px}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:65%;padding:9px 14px;border-radius:12px;font-size:.85rem;line-height:1.5}
+.msg-sent{background:var(--green);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.msg-recv{background:#f1f5f1;color:var(--text);align-self:flex-start;border-bottom-left-radius:3px}
+.msg-time{font-size:.65rem;opacity:.6;margin-top:3px;text-align:right}
+.chat-input-area{padding:14px 16px;border-top:1px solid var(--border);display:flex;gap:10px}
+.chat-input{flex:1;border:1.5px solid var(--border-2);border-radius:24px;padding:9px 16px;outline:none;font-size:.85rem}
+.chat-input:focus{border-color:var(--green)}
+
+/* ── CERT ── */
+.cert-wrap{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:48px 40px;max-width:600px;margin:0 auto;text-align:center}
+.cert-icon{width:80px;height:80px;border-radius:50%;background:var(--green-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 20px}
+.cert-type{font-size:1.15rem;font-weight:700;color:var(--text)}
+.cert-certifies{font-size:.85rem;color:var(--text-3);margin:6px 0 16px}
+.cert-name{font-size:1.6rem;font-weight:800;color:var(--text);border-bottom:2px solid var(--text);display:inline-block;padding-bottom:4px;margin-bottom:16px}
+.cert-for{font-size:.9rem;color:var(--text-2);margin-bottom:8px}
+.cert-org{font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:16px}
+.cert-hours{font-size:.9rem;color:var(--text-2)}
+.cert-hours strong{color:var(--text)}
+
+/* ── NOTIFICATION LIST ── */
+.notif-item{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.notif-item:last-child{border-bottom:none}
+.notif-icon{width:40px;height:40px;border-radius:50%;background:var(--green-light);color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem}
+.notif-title{font-weight:600;font-size:.875rem;margin-bottom:3px}
+.notif-msg{font-size:.8rem;color:var(--text-2);line-height:1.4}
+.notif-time{font-size:.72rem;color:var(--text-3);margin-top:4px}
+.notif-unread{background:var(--green-light)}
+
+/* ── APP STATUS ── */
+.status-timeline{display:flex;flex-direction:column;gap:16px;margin-top:16px}
+.timeline-step{display:flex;gap:14px;align-items:flex-start}
+.timeline-dot{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;margin-top:2px}
+.timeline-dot.done{background:var(--green);color:#fff}
+.timeline-dot.active{background:#fef9c3;color:#854d0e;border:2px solid var(--accent)}
+.timeline-dot.waiting{background:#f1f5f9;color:var(--text-3);border:2px solid var(--border)}
+.timeline-info .step-title{font-weight:600;font-size:.875rem}
+.timeline-info .step-sub{font-size:.78rem;color:var(--text-3);margin-top:2px}
+
+/* ── MISC ── */
+.flex{display:flex}.items-center{align-items:center}.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
+.justify-between{justify-content:space-between}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}
+.mt-4{margin-top:16px}.text-muted{color:var(--text-3)}.text-sm{font-size:.83rem}.font-bold{font-weight:700}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty-state i{font-size:2.5rem;margin-bottom:12px;opacity:.4;display:block}
+.empty-state h3{font-size:1rem;color:var(--text-2);margin-bottom:6px}
+.pagination{display:flex;gap:5px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.page-link{padding:6px 12px;border-radius:6px;border:1px solid var(--border);font-size:.78rem;font-weight:600;color:var(--text-2)}
+.page-link:hover,.page-link.active{background:var(--green);color:#fff;border-color:var(--green)}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.68rem;font-weight:600;margin:2px;background:var(--green-light);color:var(--green-dark)}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.progress-bar{height:6px;background:#e5e5e5;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .4s}
+</style>
+{% block extra_css %}{% endblock %}
+{% load static %}
+</head>
+<body>
+{% block full_page %}
+<div class="layout">
+  {% if user.is_authenticated %}
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="20" fill="#4a7c5f"/>
+        <path d="M12 26c0-4 3-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="20" cy="15" r="4" fill="#fff"/>
+        <path d="M8 20c1-3 3-5 5-5" stroke="#a8d5b5" stroke-width="2" stroke-linecap="round"/>
+        <path d="M32 20c-1-3-3-5-5-5" stroke="#a8d5b5" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span class="sidebar-logo-text">iVolunteer</span>
+    </div>
+    <nav class="sidebar-nav">
+      {% if user.role == 'admin' or user.is_superuser %}
+        <a href="{% url 'admin_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+        <a href="{% url 'admin_organizations' %}" class="nav-item {% if 'admin_org' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-building-user"></i> Organizations
+        </a>
+        <a href="{% url 'admin_users' %}" class="nav-item {% if 'admin_user' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-users"></i> Users
+        </a>
+        <a href="{% url 'admin_verification' %}" class="nav-item {% if 'verification' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-id-card"></i> Verification
+        </a>
+        <a href="{% url 'admin_opportunities' %}" class="nav-item {% if 'admin_opportunities' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-hand-holding-heart"></i> Opportunities
+        </a>
+        <a href="{% url 'admin_reports' %}" class="nav-item {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-flag"></i> Reports
+        </a>
+        <a href="{% url 'admin_analytics' %}" class="nav-item {% if 'analytics' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-chart-bar"></i> Analytics
+        </a>
+      {% elif user.role == 'organization' %}
+        <a href="{% url 'org_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'org_dashboard' %}active{% endif %}">
+          <i class="fas fa-th-large"></i> Home
+        </a>
+        <a href="{% url 'create_opp' %}" class="nav-item {% if 'create_opp' == request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-plus-circle"></i> Post Opportunity
+        </a>
+        <a href="{% url 'org_manage_volunteers' %}" class="nav-item {% if 'manage_volunteers' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-user-check"></i> Manage Volunteers
+        </a>
+        <a href="{% url 'org_analytics' %}" class="nav-item {% if 'org_analytics' == request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-chart-line"></i> Analytics
+        </a>
+        <a href="{% url 'chats' %}" class="nav-item {% if 'chat' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-comments"></i> Messages
+        </a>
+        <a href="{% url 'org_profile' %}" class="nav-item {% if 'org_profile' == request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-id-badge"></i> Profile
+        </a>
+      {% else %}
+        <a href="{% url 'vol_dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'vol_dashboard' %}active{% endif %}">
+          <i class="fas fa-th-large"></i> Home
+        </a>
+        <a href="{% url 'opportunities_list' %}" class="nav-item {% if 'opportunit' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-search"></i> Find Opportunities
+        </a>
+        <a href="{% url 'my_applications' %}" class="nav-item {% if 'application' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-clipboard-list"></i> My Applications
+        </a>
+        <a href="{% url 'forum' %}" class="nav-item {% if 'forum' in request.resolver_match.url_name or 'post' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-comments"></i> Community
+        </a>
+        <a href="{% url 'chats' %}" class="nav-item {% if 'chat' in request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-envelope"></i> Messages
+        </a>
+        <a href="{% url 'vol_profile' %}" class="nav-item {% if 'vol_profile' == request.resolver_match.url_name %}active{% endif %}">
+          <i class="fas fa-user-circle"></i> My Profile
+        </a>
+      {% endif %}
+      <a href="{% url 'logout' %}" class="nav-item nav-logout" style="margin-top:8px">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="s-avatar">
+          {% if user.profile_picture %}<img src="{{ user.profile_picture.url }}" alt="">
+          {% else %}{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}{% endif %}
+        </div>
+        <div>
+          <div class="s-user-name">{{ user.get_full_name|default:user.username }}</div>
+          <div class="s-user-role">{{ user.get_role_display }}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  {% endif %}
+  <main class="main">
+    {% if user.is_authenticated %}
+    <header class="topbar">
+      <span class="topbar-title">{% block page_title %}{% endblock %}</span>
+      <div class="topbar-right">
+        <a href="{% url 'notifications' %}" class="icon-btn" title="Notifications">
+          <i class="fas fa-bell"></i>
+          {% with unread=user.notifications.filter %}{% endwith %}
+        </a>
+        {% if user.role == 'volunteer' %}
+        <a href="{% url 'vol_profile' %}" class="icon-btn"><i class="fas fa-user"></i></a>
+        {% elif user.role == 'organization' %}
+        <a href="{% url 'org_profile' %}" class="icon-btn"><i class="fas fa-building"></i></a>
+        {% endif %}
+      </div>
+    </header>
+    {% endif %}
+    <div class="content">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}">
+        <i class="fas fa-info-circle" style="margin-top:1px;flex-shrink:0"></i> {{ message }}
+      </div>
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+</div>
+{% endblock full_page %}
+{% block extra_js %}{% endblock %}
+</body>
+</html>

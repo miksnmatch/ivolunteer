@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block title %}Apply — {{ opp.title }}{% endblock %}
+{% block page_title %}Apply for Opportunity{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'opp_detail' opp.pk %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back to Opportunity</a></div>
+<div style="max-width:640px">
+  <div class="card mb-4">
+    <div class="card-body" style="background:#e8f5ee;border-radius:12px 12px 0 0;padding:16px 20px">
+      <div style="font-weight:700;font-size:1rem">{{ opp.title }}</div>
+      <div style="font-size:.8rem;color:#3d6b50;margin-top:3px"><i class="fas fa-building"></i> {{ opp.organization.name }} &nbsp;|&nbsp; <i class="fas fa-calendar"></i> {{ opp.date }} &nbsp;|&nbsp; <i class="fas fa-map-marker-alt"></i> {{ opp.location }}</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h2 style="font-size:1.1rem;font-weight:700;margin-bottom:20px">Volunteer Application Form</h2>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="full_name" class="form-control" value="{{ request.user.get_full_name }}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" value="{{ request.user.email }}" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" value="{{ request.user.phone_number }}" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Why do you want to volunteer for this opportunity?</label>
+          <textarea name="motivation" class="form-control" rows="4" placeholder="Tell us your motivation…"></textarea>
+        </div>
+        <div class="form-group">
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer">
+            <input type="checkbox" name="has_experience" style="margin-top:2px;accent-color:#4a7c5f">
+            <span style="font-size:.875rem;color:#555">I have previous volunteer experience</span>
+          </label>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button type="submit" class="btn btn-green btn-lg"><i class="fas fa-paper-plane"></i> Submit Application</button>
+          <a href="{% url 'opp_detail' opp.pk %}" class="btn btn-grey btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Messages{% endblock %}
+{% block page_title %}Messages{% endblock %}
+{% block content %}
+<div class="chat-layout">
+  <div class="chat-list">
+    <div class="chat-list-header">Messages</div>
+    {% if conversations %}
+    {% for c in conversations %}
+    <a href="{% url 'chat_detail' c.partner.pk %}" class="chat-item">
+      <div class="chat-av">{{ c.partner.first_name|first|upper }}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="chat-name">{{ c.partner.get_full_name|default:c.partner.username }}</span>
+          {% if c.unread %}<span style="background:#4a7c5f;color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700">{{ c.unread }}</span>{% endif %}
+        </div>
+        <div class="chat-preview">{% if c.last %}{{ c.last.content }}{% else %}No messages yet{% endif %}</div>
+      </div>
+    </a>
+    {% endfor %}
+    {% else %}
+    <div style="padding:40px 20px;text-align:center;color:#888;font-size:.85rem"><i class="fas fa-comments" style="font-size:2rem;margin-bottom:12px;display:block;opacity:.3"></i>No conversations yet</div>
+    {% endif %}
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;color:#888;font-size:.9rem;flex-direction:column;gap:12px">
+    <i class="fas fa-comments" style="font-size:3rem;opacity:.2"></i>
+    <span>Select a conversation to start chatting</span>
+  </div>
+</div>
+{% endblock %}

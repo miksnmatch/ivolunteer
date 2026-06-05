@@ -1,0 +1,50 @@
+{% extends 'core/base.html' %}
+{% block title %}Applicants — {{ opp.title }}{% endblock %}
+{% block page_title %}Applicants{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'org_dashboard' %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back to Dashboard</a></div>
+<div class="card mb-4"><div class="card-body" style="background:#e8f5ee;border-radius:12px"><div style="font-weight:700;font-size:1rem">{{ opp.title }}</div><div style="font-size:.8rem;color:#3d6b50;margin-top:3px"><i class="fas fa-calendar"></i> {{ opp.date }} &nbsp;·&nbsp; <i class="fas fa-map-marker-alt"></i> {{ opp.location }} &nbsp;·&nbsp; <i class="fas fa-users"></i> {{ opp.approved_count }}/{{ opp.max_volunteers }} approved</div></div></div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="filterApps('all',this)">All ({{ applications.count }})</button>
+  <button class="tab-btn" onclick="filterApps('pending',this)">Pending ({{ opp.pending_count }})</button>
+  <button class="tab-btn" onclick="filterApps('approved',this)">Approved ({{ opp.approved_count }})</button>
+</div>
+
+{% if applications %}
+<div style="display:flex;flex-direction:column;gap:10px" id="app-list">
+{% for app in applications %}
+<div class="card app-card" data-status="{{ app.status }}">
+  <div class="card-body" style="display:flex;align-items:center;gap:16px">
+    <div style="width:46px;height:46px;border-radius:50%;background:#4a7c5f;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;flex-shrink:0;overflow:hidden">
+      {% if app.volunteer.profile_picture %}<img src="{{ app.volunteer.profile_picture.url }}" alt="" style="width:100%;height:100%;object-fit:cover">{% else %}{{ app.full_name|first|upper }}{% endif %}
+    </div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:.97rem">{{ app.full_name }}</div>
+      <div style="font-size:.78rem;color:#888;margin-top:2px"><i class="fas fa-envelope" style="color:#4a7c5f"></i> {{ app.email }} &nbsp;·&nbsp; <i class="fas fa-phone" style="color:#4a7c5f"></i> {{ app.phone }}</div>
+      {% if app.has_previous_experience %}<span style="font-size:.7rem;background:#e8f5ee;color:#2d5a3d;padding:2px 8px;border-radius:20px;font-weight:600;margin-top:4px;display:inline-block">Has Experience</span>{% endif %}
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:.72rem;color:#888">{{ app.applied_at|date:"M d" }}</span>
+      <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span>
+      <a href="{% url 'applicant_detail' app.pk %}" class="btn btn-green btn-sm">View</a>
+    </div>
+  </div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><i class="fas fa-users"></i><h3>No applicants yet</h3><p>Applicants will appear here once volunteers apply.</p></div>
+{% endif %}
+{% endblock %}
+{% block extra_js %}
+<script>
+function filterApps(status, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.app-card').forEach(c=>{
+    c.style.display = (status === 'all' || c.dataset.status === status) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

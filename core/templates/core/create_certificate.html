@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Issue Certificate{% endblock %}
+{% block page_title %}Issue Certificate{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'admin_user_detail' target.pk %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back to User</a></div>
+<div style="max-width:600px">
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:16px;border-bottom:1px solid #e5e5e5">
+        <div style="width:48px;height:48px;border-radius:50%;background:#2d5a3d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.2rem"><i class="fas fa-certificate"></i></div>
+        <div>
+          <h2 style="font-size:1.1rem;font-weight:800">Issue Certificate</h2>
+          <div style="font-size:.83rem;color:#888;margin-top:2px">For: {{ target.get_full_name|default:target.username }}</div>
+        </div>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group"><label class="form-label">Certificate Type</label>
+          <select name="cert_type" class="form-control" required>
+            {% for val,label in cert_types %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Certificate Title</label><input type="text" name="template_title" class="form-control" placeholder="e.g., Outstanding Volunteer Service" required></div>
+        <div class="form-group"><label class="form-label">Organization <span style="color:#888;font-weight:400">(optional)</span></label>
+          <select name="organization" class="form-control">
+            <option value="">None / General</option>
+            {% for org in orgs %}<option value="{{ org.pk }}">{{ org.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Hours Contributed</label><input type="number" name="hours" class="form-control" value="0" min="0"></div>
+          <div class="form-group"><label class="form-label">Issued By</label><input type="text" name="issued_by" class="form-control" value="Admin User"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Issuer Role</label><input type="text" name="issued_role" class="form-control" value="Administrator"></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button type="submit" class="btn btn-green btn-lg"><i class="fas fa-paper-plane"></i> Issue Certificate</button>
+          <a href="{% url 'admin_user_detail' target.pk %}" class="btn btn-grey btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

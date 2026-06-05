@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if opp %}Edit{% else %}Post{% endif %} Opportunity{% endblock %}
+{% block page_title %}{% if opp %}Edit Opportunity{% else %}Post New Opportunity{% endif %}{% endblock %}
+{% block content %}
+<div style="max-width:720px">
+  <div class="card">
+    <div class="card-body">
+      <h2 style="font-size:1.1rem;font-weight:800;margin-bottom:22px">{% if opp %}Edit{% else %}Create New{% endif %} Opportunity</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group"><label class="form-label">Title</label><input type="text" name="title" class="form-control" value="{{ opp.title|default:'' }}" placeholder="e.g., Beach Cleanup Volunteer" required></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Category</label>
+            <select name="category" class="form-control" required>
+              {% for val,label in categories %}<option value="{{ val }}" {% if opp and opp.category == val %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">Location</label><input type="text" name="location" class="form-control" value="{{ opp.location|default:'' }}" placeholder="City, Province" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="5" placeholder="Describe the volunteer opportunity in detail…" required>{{ opp.description|default:'' }}</textarea></div>
+        <div class="form-row-3">
+          <div class="form-group"><label class="form-label">Date</label><input type="date" name="date" class="form-control" value="{{ opp.date|default:'' }}" required></div>
+          <div class="form-group"><label class="form-label">Start Time</label><input type="time" name="start_time" class="form-control" value="{{ opp.start_time|default:'' }}" required></div>
+          <div class="form-group"><label class="form-label">End Time</label><input type="time" name="end_time" class="form-control" value="{{ opp.end_time|default:'' }}" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Max Volunteers</label><input type="number" name="max_volunteers" class="form-control" value="{{ opp.max_volunteers|default:'50' }}" min="1" required></div>
+        <div class="form-group"><label class="form-label">Requirements <span style="color:#888;font-weight:400">(optional)</span></label><textarea name="requirements" class="form-control" rows="3" placeholder="Skills, physical requirements, minimum age…">{{ opp.requirements|default:'' }}</textarea></div>
+        <div class="form-group"><label class="form-label">What to Bring <span style="color:#888;font-weight:400">(optional)</span></label><textarea name="what_to_bring" class="form-control" rows="2" placeholder="List items volunteers should bring…">{{ opp.what_to_bring|default:'' }}</textarea></div>
+        <div class="form-group"><label class="form-label">Cover Image <span style="color:#888;font-weight:400">(optional)</span></label><input type="file" name="image" class="form-control" accept="image/*"></div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <button type="submit" class="btn btn-green btn-lg"><i class="fas fa-check"></i> {% if opp %}Update{% else %}Publish{% endif %} Opportunity</button>
+          <a href="{% url 'org_dashboard' %}" class="btn btn-grey btn-lg">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

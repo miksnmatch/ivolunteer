@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Verification — Admin{% endblock %}
+{% block page_title %}Verification{% endblock %}
+{% block content %}
+<div class="page-banner">Verification</div>
+<div class="tabs">
+  <a href="?tab=user" class="tab-btn {% if tab == 'user' %}active{% endif %}">User Verification ({{ user_verifs.count }})</a>
+  <a href="?tab=org" class="tab-btn {% if tab == 'org' %}active{% endif %}">Organization Verification ({{ org_verifs.count }})</a>
+</div>
+
+{% if tab == 'user' %}
+{% if user_verifs %}
+<div class="verif-grid">
+{% for v in user_verifs %}
+<div class="verif-card">
+  <div class="verif-card-header">
+    <div class="verif-avatar">{{ v.user.first_name|first|upper }}</div>
+    <div>
+      <div class="verif-name">{{ v.user.get_full_name|default:v.user.username }}</div>
+      <div class="verif-id">#U{{ v.user.pk|stringformat:"03d" }}</div>
+    </div>
+  </div>
+  <div class="verif-info">
+    <div class="k">Email</div><div class="v">{{ v.user.email }}</div>
+    <div class="k">ID Type</div><div class="v">{{ v.get_id_type_display }}</div>
+    <div class="k">Phone</div><div class="v">{{ v.user.phone_number|default:"—" }}</div>
+    <div class="k">Location</div><div class="v">{{ v.user.location|default:"—" }}</div>
+  </div>
+  <div class="verif-date">Submitted {{ v.submitted_at|date:"M d, Y" }}</div>
+  {% if v.id_document %}
+  <div style="margin-bottom:12px">
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:6px">ID Document</div>
+    <a href="{{ v.id_document.url }}" target="_blank" class="btn btn-grey btn-sm btn-block"><i class="fas fa-file"></i> View Document</a>
+  </div>
+  {% endif %}
+  <a href="{% url 'admin_verify_user' v.pk %}" class="btn btn-green btn-block btn-sm">Review</a>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><i class="fas fa-id-card"></i><h3>No pending user verifications</h3></div>
+{% endif %}
+
+{% else %}
+{% if org_verifs %}
+<div class="verif-grid">
+{% for v in org_verifs %}
+<div class="verif-card">
+  <div class="verif-card-header">
+    <div class="verif-avatar">{{ v.organization.name|first|upper }}</div>
+    <div>
+      <div class="verif-name">{{ v.organization.name }}</div>
+      <div class="verif-id">#V{{ v.pk|stringformat:"03d" }}</div>
+    </div>
+  </div>
+  <div class="verif-info">
+    <div class="k">Email</div><div class="v">{{ v.organization.user.email }}</div>
+    <div class="k">Org Type</div><div class="v">{{ v.organization.get_org_type_display }}</div>
+    <div class="k">Contact</div><div class="v">{{ v.organization.contact_person|default:"—" }}</div>
+    <div class="k">Submitted</div><div class="v">{{ v.submitted_at|date:"M d, Y" }}</div>
+  </div>
+  {% if v.organization.accreditation_doc %}
+  <div style="margin-bottom:12px">
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:6px">Accreditation/Permit Document</div>
+    <a href="{{ v.organization.accreditation_doc.url }}" target="_blank" class="btn btn-grey btn-sm btn-block"><i class="fas fa-file"></i> View Document</a>
+  </div>
+  {% endif %}
+  <a href="{% url 'admin_verify_org' v.pk %}" class="btn btn-green btn-block btn-sm">Review</a>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><i class="fas fa-building-user"></i><h3>No pending organization verifications</h3></div>
+{% endif %}
+{% endif %}
+{% endblock %}

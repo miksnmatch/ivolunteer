@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block title %}Rate Volunteer{% endblock %}
+{% block page_title %}Rate Volunteer{% endblock %}
+{% block content %}
+<div style="max-width:500px">
+  <div class="card">
+    <div class="card-body">
+      <div style="text-align:center;margin-bottom:22px">
+        <div style="width:56px;height:56px;border-radius:50%;background:#4a7c5f;color:#fff;font-size:1.4rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">{{ app.full_name|first|upper }}</div>
+        <h2 style="font-size:1.1rem;font-weight:800">Rate {{ app.full_name }}</h2>
+        <p style="color:#888;font-size:.83rem;margin-top:4px">{{ app.opportunity.title }}</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">Performance Rating</label>
+          <div style="display:flex;gap:8px;margin-top:6px" id="star-row">
+            {% for i in "12345" %}
+            <label style="cursor:pointer;font-size:2rem;color:#ddd;transition:.1s">★<input type="radio" name="rating" value="{{ forloop.counter }}" style="display:none" required></label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Feedback</label><textarea name="feedback" class="form-control" rows="4" placeholder="How did this volunteer perform?"></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button type="submit" class="btn btn-green btn-lg"><i class="fas fa-star"></i> Submit Rating</button>
+          <a href="{% url 'applicant_detail' app.pk %}" class="btn btn-grey btn-lg">Skip</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.querySelectorAll('#star-row label').forEach((s,i,arr)=>{
+  s.addEventListener('click',()=>{arr.forEach((t,j)=>{t.style.color=j<=i?'#f0a500':'#ddd';});s.querySelector('input').checked=true;});
+  s.addEventListener('mouseenter',()=>{arr.forEach((t,j)=>{t.style.color=j<=i?'#f0a500':'#ddd';});});
+  s.addEventListener('mouseleave',()=>{const c=[...arr].findIndex(t=>t.querySelector('input').checked);arr.forEach((t,j)=>{t.style.color=j<=c?'#f0a500':'#ddd';});});
+});
+</script>
+{% endblock %}

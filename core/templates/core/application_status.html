@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Application Status{% endblock %}
+{% block page_title %}Application Status{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'my_applications' %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back</a></div>
+<div style="max-width:640px">
+  <div class="card mb-4">
+    <div class="card-body">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <h2 style="font-size:1.1rem;font-weight:800">{{ app.opportunity.title }}</h2>
+          <div style="font-size:.83rem;color:#888;margin-top:3px">{{ app.opportunity.organization.name }} · {{ app.opportunity.date }}</div>
+        </div>
+        <span class="badge badge-{{ app.status }}" style="font-size:.8rem;padding:5px 13px">{{ app.get_status_display }}</span>
+      </div>
+
+      <div class="status-timeline">
+        <div class="timeline-step">
+          <div class="timeline-dot done"><i class="fas fa-check"></i></div>
+          <div class="timeline-info">
+            <div class="step-title">Application Submitted</div>
+            <div class="step-sub">{{ app.applied_at|date:"M d, Y H:i" }}</div>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot {% if app.status != 'pending' %}done{% else %}active{% endif %}">
+            {% if app.status != 'pending' %}<i class="fas fa-check"></i>{% else %}<i class="fas fa-clock"></i>{% endif %}
+          </div>
+          <div class="timeline-info">
+            <div class="step-title">Under Review</div>
+            <div class="step-sub">{% if app.status == 'pending' %}Waiting for organization response{% else %}Reviewed {{ app.reviewed_at|date:"M d, Y" }}{% endif %}</div>
+          </div>
+        </div>
+        <div class="timeline-step">
+          <div class="timeline-dot {% if app.status == 'approved' or app.status == 'completed' %}done{% elif app.status == 'rejected' %}waiting{% else %}waiting{% endif %}">
+            {% if app.status == 'approved' or app.status == 'completed' %}<i class="fas fa-check"></i>
+            {% elif app.status == 'rejected' %}<i class="fas fa-times"></i>
+            {% else %}<i class="fas fa-hourglass"></i>{% endif %}
+          </div>
+          <div class="timeline-info">
+            <div class="step-title">Decision</div>
+            <div class="step-sub">
+              {% if app.status == 'approved' %}Application accepted!
+              {% elif app.status == 'rejected' %}Application not approved
+              {% elif app.status == 'completed' %}Completed successfully!
+              {% else %}Pending decision{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h3 style="font-weight:700;margin-bottom:14px;font-size:.95rem">Application Details</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:.85rem">
+        <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Full Name</div><div style="margin-top:3px;font-weight:500">{{ app.full_name }}</div></div>
+        <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Email</div><div style="margin-top:3px;font-weight:500">{{ app.email }}</div></div>
+        <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Phone</div><div style="margin-top:3px;font-weight:500">{{ app.phone }}</div></div>
+        <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Experience</div><div style="margin-top:3px;font-weight:500">{% if app.has_previous_experience %}Yes{% else %}No{% endif %}</div></div>
+      </div>
+      {% if app.motivation %}
+      <div style="margin-top:14px"><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Motivation</div><div style="font-size:.875rem;color:#555;line-height:1.6">{{ app.motivation }}</div></div>
+      {% endif %}
+      {% if app.completion_rating %}
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e5e5e5">
+        <div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Organization Rating</div>
+        <div style="font-size:1.2rem;color:#f0a500">{% for i in "12345" %}{% if forloop.counter <= app.completion_rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+        {% if app.completion_feedback %}<div style="font-size:.83rem;color:#555;margin-top:5px">{{ app.completion_feedback }}</div>{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

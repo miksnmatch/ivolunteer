@@ -1,0 +1,64 @@
+{% extends 'core/base.html' %}
+{% block title %}Organizations — Admin{% endblock %}
+{% block page_title %}Organizations{% endblock %}
+{% block content %}
+<div class="page-banner">Organizations</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px">
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-building-user"></i></div><div><div class="stat-val">{{ total }}</div><div class="stat-label">Total Organizations</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-val">{{ active }}</div><div class="stat-label">Active Organizations</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div><div class="stat-val">{{ pending }}</div><div class="stat-label">Pending Review</div></div></div>
+</div>
+
+<div class="search-bar">
+  <form method="get" style="display:flex;gap:10px;flex:1">
+    <div class="search-wrap" style="flex:1">
+      <i class="fas fa-search"></i>
+      <input type="text" name="q" value="{{ q }}" placeholder="Search by organization name…" class="form-control" style="padding-left:38px">
+    </div>
+    <select name="status" class="form-control" style="width:160px">
+      <option value="">All Status</option>
+      <option value="active" {% if sf == 'active' %}selected{% endif %}>Active</option>
+      <option value="pending" {% if sf == 'pending' %}selected{% endif %}>Pending</option>
+      <option value="suspended" {% if sf == 'suspended' %}selected{% endif %}>Suspended</option>
+      <option value="inactive" {% if sf == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select>
+    <button type="submit" class="btn btn-green">Search</button>
+    {% if q or sf %}<a href="{% url 'admin_organizations' %}" class="btn btn-grey">Clear</a>{% endif %}
+  </form>
+</div>
+
+{% if page_obj.object_list %}
+{% for org in page_obj %}
+<div class="org-list-card">
+  <div class="org-list-logo">{{ org.name|first|upper }}</div>
+  <div class="org-list-body">
+    <div class="org-list-name">
+      {{ org.name }}
+      <span class="badge badge-{{ org.user.status }}">{{ org.user.get_status_display }}</span>
+      {% if org.is_verified %}<span class="badge badge-completed" style="font-size:.65rem"><i class="fas fa-check-circle"></i> Verified</span>{% endif %}
+    </div>
+    <div class="org-list-desc">{{ org.description|default:"No description provided."|truncatewords:20 }}</div>
+    <div class="org-list-meta">
+      <span><i class="fas fa-envelope"></i> {{ org.user.email }}</span>
+      {% if org.user.phone_number %}<span><i class="fas fa-phone"></i> {{ org.user.phone_number }}</span>{% endif %}
+      {% if org.address %}<span><i class="fas fa-map-marker-alt"></i> {{ org.address }}</span>{% endif %}
+      {% if org.website %}<span><i class="fas fa-globe"></i> <a href="{{ org.website }}" target="_blank" style="color:#4a7c5f">{{ org.website }}</a></span>{% endif %}
+    </div>
+  </div>
+  <div style="flex-shrink:0">
+    <a href="{% url 'admin_org_detail' org.pk %}" class="btn btn-green btn-sm">View</a>
+  </div>
+</div>
+{% endfor %}
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&q={{ q }}&status={{ sf }}" class="page-link"><i class="fas fa-chevron-left"></i></a>{% endif %}
+  {% for n in page_obj.paginator.page_range %}{% if n == page_obj.number %}<span class="page-link active">{{ n }}</span>{% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}<a href="?page={{ n }}&q={{ q }}&status={{ sf }}" class="page-link">{{ n }}</a>{% endif %}{% endfor %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&q={{ q }}&status={{ sf }}" class="page-link"><i class="fas fa-chevron-right"></i></a>{% endif %}
+</div>
+{% endif %}
+{% else %}
+<div class="empty-state"><i class="fas fa-building-user"></i><h3>No organizations found</h3></div>
+{% endif %}
+{% endblock %}

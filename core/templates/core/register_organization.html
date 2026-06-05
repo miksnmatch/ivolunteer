@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+{% block full_page %}
+<div class="auth-page">
+  <div class="auth-bg" style="background:linear-gradient(135deg,#1a3a2a,#4a7c5f)">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:1;padding:40px">
+      <div style="color:#fff;text-align:center;max-width:360px">
+        <div style="font-size:3rem;margin-bottom:16px">🏢</div>
+        <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:12px">Register Your Organization</h2>
+        <p style="opacity:.8;line-height:1.6">Connect with passionate volunteers ready to support your cause. Account will be reviewed within 3–5 business days.</p>
+      </div>
+    </div>
+  </div>
+  <div class="auth-panel" style="width:520px">
+    <div class="auth-inner" style="max-width:460px">
+      <div class="auth-logo">
+        <svg width="28" height="28" viewBox="0 0 40 40"><circle cx="20" cy="20" r="20" fill="#4a7c5f"/><path d="M12 26c0-4 3-7 8-7s8 3 8 7" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="15" r="4" fill="#fff"/></svg>
+        <span class="auth-logo-text">iVolunteer</span>
+      </div>
+      <h1 class="auth-title">Organization Account</h1>
+      <p class="auth-sub">Create your organization profile</p>
+      {% for message in messages %}<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> {{ message }}</div>{% endfor %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Contact Person Full Name</label>
+            <input type="text" name="full_name" class="form-control" placeholder="Full Name" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="org@email.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-control" placeholder="09XXXXXXXXX">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Min. 8 characters" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Organization Name</label>
+          <input type="text" name="org_name" class="form-control" placeholder="Your Organization Name" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Organization Type</label>
+            <select name="org_type" class="form-control" required>
+              <option value="">Select type…</option>
+              <option value="environmental">Environmental & Conservation</option>
+              <option value="health">Health & Medical Support</option>
+              <option value="education">Education & Youth Development</option>
+              <option value="disaster">Disaster Relief & Humanitarian</option>
+              <option value="community">Community & Social Welfare</option>
+              <option value="animal">Animal Welfare</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Position</label>
+            <input type="text" name="position" class="form-control" placeholder="e.g., Director">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Accreditation / Permit Document</label>
+          <input type="file" name="accreditation_doc" class="form-control" accept=".jpg,.jpeg,.png,.pdf">
+          <div style="font-size:.7rem;color:var(--text-3);margin-top:4px">JPG, PNG, PDF accepted (max 5MB)</div>
+        </div>
+        <button type="submit" class="btn btn-green btn-block btn-lg">Create Organization Account</button>
+      </form>
+      <div class="auth-bottom">Already have an account? <a href="{% url 'login' %}" class="auth-link">Log in</a></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

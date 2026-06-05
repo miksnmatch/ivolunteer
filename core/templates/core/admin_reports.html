@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Reports — Admin{% endblock %}
+{% block page_title %}Reports{% endblock %}
+{% block content %}
+<div class="page-banner">Reports</div>
+<div class="tabs">
+  <a href="?tab=active&type={{ ttype }}" class="tab-btn {% if tab == 'active' %}active{% endif %}">Active Reports</a>
+  <a href="?tab=history&type={{ ttype }}" class="tab-btn {% if tab == 'history' %}active{% endif %}">History</a>
+</div>
+<div style="display:flex;gap:10px;margin-bottom:20px">
+  <a href="?tab={{ tab }}&type=user" class="btn {% if ttype == 'user' %}btn-green{% else %}btn-grey{% endif %} btn-sm"><i class="fas fa-user"></i> Volunteer Reports</a>
+  <a href="?tab={{ tab }}&type=org" class="btn {% if ttype == 'org' %}btn-green{% else %}btn-grey{% endif %} btn-sm"><i class="fas fa-building"></i> Organization Reports</a>
+</div>
+
+{% if page_obj.object_list %}
+<div class="report-grid">
+{% for r in page_obj %}
+<div class="report-card">
+  <div class="report-header">
+    <span class="report-id">#RPT{{ r.pk|stringformat:"03d" }}</span>
+    <span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span>
+  </div>
+  <div class="report-name">{% if r.reported_user %}{{ r.reported_user.get_full_name }}{% elif r.reported_org %}{{ r.reported_org.name }}{% endif %}</div>
+  <div class="report-reason" style="margin-bottom:8px">{{ r.reason }}</div>
+  <div style="font-size:.75rem;color:#888;margin-bottom:10px">
+    Reported by <strong>{{ r.reporter.get_full_name|default:r.reporter.username }}</strong> · {{ r.created_at|date:"M d, Y" }}
+  </div>
+  {% if r.description %}<p style="font-size:.8rem;color:#555;line-height:1.5;margin-bottom:10px">{{ r.description|truncatewords:20 }}</p>{% endif %}
+  <a href="{% url 'admin_report_detail' r.pk %}" class="btn btn-green btn-sm btn-block">View Details</a>
+</div>
+{% endfor %}
+</div>
+{% if page_obj.has_other_pages %}
+<div class="pagination">
+  {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}&tab={{ tab }}&type={{ ttype }}" class="page-link"><i class="fas fa-chevron-left"></i></a>{% endif %}
+  {% for n in page_obj.paginator.page_range %}{% if n == page_obj.number %}<span class="page-link active">{{ n }}</span>{% elif n >= page_obj.number|add:"-2" and n <= page_obj.number|add:"2" %}<a href="?page={{ n }}&tab={{ tab }}&type={{ ttype }}" class="page-link">{{ n }}</a>{% endif %}{% endfor %}
+  {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}&tab={{ tab }}&type={{ ttype }}" class="page-link"><i class="fas fa-chevron-right"></i></a>{% endif %}
+</div>
+{% endif %}
+{% else %}
+<div class="empty-state"><i class="fas fa-flag"></i><h3>No reports found</h3></div>
+{% endif %}
+{% endblock %}

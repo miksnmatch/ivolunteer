@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Analytics{% endblock %}
+{% block page_title %}Analytics{% endblock %}
+{% block content %}
+<div class="page-banner">Analytics</div>
+<div class="stats-grid">
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-file-alt"></i></div><div><div class="stat-val">{{ total }}</div><div class="stat-label">Total Applications</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div><div class="stat-val">{{ approved }}</div><div class="stat-label">Approved</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-flag-checkered"></i></div><div><div class="stat-val">{{ completed }}</div><div class="stat-label">Completed</div></div></div>
+  <div class="stat-card"><div class="stat-icon"><i class="fas fa-percentage"></i></div><div><div class="stat-val">{{ success_rate }}%</div><div class="stat-label">Success Rate</div></div></div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+  <div class="card"><div class="card-body">
+    <div style="font-weight:700;margin-bottom:16px">Application Funnel</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div><div style="font-size:.8rem;color:#888;margin-bottom:4px;display:flex;justify-content:space-between"><span>Total Applications</span><span>{{ total }}</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div></div>
+      <div><div style="font-size:.8rem;color:#888;margin-bottom:4px;display:flex;justify-content:space-between"><span>Approved</span><span>{{ approved }}</span></div><div class="progress-bar"><div class="progress-fill" style="width:{% if total %}{% widthratio approved total 100 %}{% else %}0{% endif %}%"></div></div></div>
+      <div><div style="font-size:.8rem;color:#888;margin-bottom:4px;display:flex;justify-content:space-between"><span>Completed</span><span>{{ completed }}</span></div><div class="progress-bar"><div class="progress-fill" style="width:{% if total %}{% widthratio completed total 100 %}{% else %}0{% endif %}%"></div></div></div>
+    </div>
+  </div></div>
+  <div class="card"><div class="card-body">
+    <div style="font-weight:700;margin-bottom:16px">Organization Overview</div>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:.875rem">
+      <div style="display:flex;justify-content:space-between;padding:10px;background:#f8faf8;border-radius:8px"><span>Total Events</span><span style="font-weight:700;color:#4a7c5f">{{ org.total_events }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:#f8faf8;border-radius:8px"><span>Total Volunteers</span><span style="font-weight:700;color:#4a7c5f">{{ org.total_volunteers }}</span></div>
+      <div style="display:flex;justify-content:space-between;padding:10px;background:#f8faf8;border-radius:8px"><span>Avg. Rating</span><span style="font-weight:700;color:#f0a500">{{ org.rating|floatformat:1 }} ★</span></div>
+    </div>
+  </div></div>
+</div>
+{% endblock %}

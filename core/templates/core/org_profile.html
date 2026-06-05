@@ -1,0 +1,60 @@
+{% extends 'core/base.html' %}
+{% block title %}Organization Profile{% endblock %}
+{% block page_title %}Organization Profile{% endblock %}
+{% block content %}
+<div class="profile-hero">
+  <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;border:3px solid rgba(255,255,255,.3);flex-shrink:0">{{ org.name|first|upper }}</div>
+  <div style="flex:1">
+    <div class="profile-name">{{ org.name }}</div>
+    <div class="profile-email">{{ org.get_org_type_display }}</div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      {% if org.is_verified %}<span class="profile-tag"><i class="fas fa-check-circle"></i> Verified Organization</span>{% else %}<span class="profile-tag" style="background:rgba(255,200,0,.2)"><i class="fas fa-clock"></i> Pending Verification</span>{% endif %}
+    </div>
+  </div>
+  <div style="display:flex;gap:28px;text-align:center">
+    <div><div style="font-size:1.6rem;font-weight:800">{{ org.total_events }}</div><div style="font-size:.78rem;opacity:.8">Events</div></div>
+    <div><div style="font-size:1.6rem;font-weight:800">{{ org.total_volunteers }}</div><div style="font-size:.78rem;opacity:.8">Volunteers</div></div>
+    <div><div style="font-size:1.6rem;font-weight:800">{{ org.rating|floatformat:1 }}</div><div style="font-size:.78rem;opacity:.8">Rating</div></div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 300px;gap:24px">
+  <div>
+    <div class="card">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:18px;font-size:1rem">Edit Organization Profile</h3>
+        <form method="post">
+          {% csrf_token %}
+          <div class="form-group"><label class="form-label">Organization Name</label><input type="text" name="name" class="form-control" value="{{ org.name }}"></div>
+          <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="4">{{ org.description }}</textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Website</label><input type="url" name="website" class="form-control" value="{{ org.website }}" placeholder="https://…"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-control" value="{{ request.user.phone_number }}"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Address</label><input type="text" name="address" class="form-control" value="{{ org.address }}"></div>
+          <button type="submit" class="btn btn-green"><i class="fas fa-save"></i> Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card mb-4"><div class="card-body">
+      <div style="font-weight:700;margin-bottom:12px;font-size:.9rem">Contact Information</div>
+      <div style="font-size:.85rem;display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px"><i class="fas fa-user" style="color:#4a7c5f;width:14px"></i> {{ org.contact_person }}</div>
+        <div style="display:flex;align-items:center;gap:8px"><i class="fas fa-envelope" style="color:#4a7c5f;width:14px"></i> {{ request.user.email }}</div>
+        {% if request.user.phone_number %}<div style="display:flex;align-items:center;gap:8px"><i class="fas fa-phone" style="color:#4a7c5f;width:14px"></i> {{ request.user.phone_number }}</div>{% endif %}
+        {% if org.address %}<div style="display:flex;align-items:center;gap:8px"><i class="fas fa-map-marker-alt" style="color:#4a7c5f;width:14px"></i> {{ org.address }}</div>{% endif %}
+        {% if org.website %}<div style="display:flex;align-items:center;gap:8px"><i class="fas fa-globe" style="color:#4a7c5f;width:14px"></i> <a href="{{ org.website }}" target="_blank" style="color:#4a7c5f">{{ org.website }}</a></div>{% endif %}
+      </div>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <div style="font-weight:700;margin-bottom:12px;font-size:.9rem">Quick Links</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="{% url 'create_opp' %}" class="btn btn-green btn-block btn-sm"><i class="fas fa-plus"></i> Post Opportunity</a>
+        <a href="{% url 'org_analytics' %}" class="btn btn-outline-green btn-block btn-sm"><i class="fas fa-chart-bar"></i> View Analytics</a>
+        <a href="{% url 'chats' %}" class="btn btn-grey btn-block btn-sm"><i class="fas fa-comments"></i> Messages</a>
+      </div>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

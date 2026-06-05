@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}My Applications — iVolunteer{% endblock %}
+{% block page_title %}My Applications{% endblock %}
+{% block content %}
+<div class="page-banner">My Applications</div>
+
+{% if applications %}
+<div style="display:flex;flex-direction:column;gap:14px">
+  {% for app in applications %}
+  <div class="card">
+    <div class="card-body" style="display:flex;align-items:center;gap:20px">
+      <div style="width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,#2d5a3d,#4a7c5f);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
+        {% if app.opportunity.category == 'environmental' %}🌿{% elif app.opportunity.category == 'healthcare' %}🏥{% elif app.opportunity.category == 'education' %}📚{% elif app.opportunity.category == 'community' %}🤝{% elif app.opportunity.category == 'animal_care' %}🐾{% elif app.opportunity.category == 'disaster' %}🆘{% else %}❤️{% endif %}
+      </div>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:.97rem">{{ app.opportunity.title }}</div>
+        <div style="font-size:.8rem;color:#888;margin-top:2px"><i class="fas fa-building" style="color:#4a7c5f"></i> {{ app.opportunity.organization.name }} &nbsp;·&nbsp; <i class="fas fa-calendar" style="color:#4a7c5f"></i> {{ app.opportunity.date }}</div>
+        <div style="font-size:.75rem;color:#aaa;margin-top:3px">Applied {{ app.applied_at|date:"M d, Y" }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span>
+        <a href="{% url 'application_status' app.pk %}" class="btn btn-outline-green btn-sm">View</a>
+        {% if app.status == 'completed' %}
+        <a href="{% url 'rate_org' app.opportunity.pk %}" class="btn btn-green btn-sm"><i class="fas fa-star"></i> Rate</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <i class="fas fa-clipboard-list"></i>
+  <h3>No applications yet</h3>
+  <p>Browse opportunities and apply to get started!</p>
+  <a href="{% url 'opportunities_list' %}" class="btn btn-green" style="margin-top:16px">Find Opportunities</a>
+</div>
+{% endif %}
+{% endblock %}

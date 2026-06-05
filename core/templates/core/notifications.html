@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div style="max-width:680px">
+  <div class="card">
+    <div class="card-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2 style="font-size:1rem;font-weight:700">All Notifications</h2>
+        <span style="font-size:.78rem;color:#888">{{ notifications.count }} total</span>
+      </div>
+      {% if notifications %}
+      {% for n in notifications %}
+      <div class="notif-item {% if not n.is_read %}notif-unread{% endif %}" style="{% if not n.is_read %}background:#f0f9f4;margin:-1px -24px;padding:14px 24px;{% endif %}">
+        <div class="notif-icon">
+          {% if 'accepted' in n.notification_type %}<i class="fas fa-check-circle"></i>
+          {% elif 'rejected' in n.notification_type or 'warning' in n.notification_type %}<i class="fas fa-exclamation-circle" style="color:#dc2626"></i>
+          {% elif 'verification' in n.notification_type %}<i class="fas fa-shield-alt"></i>
+          {% elif 'reply' in n.notification_type %}<i class="fas fa-comment"></i>
+          {% elif 'rate' in n.notification_type %}<i class="fas fa-star" style="color:#f0a500"></i>
+          {% else %}<i class="fas fa-bell"></i>{% endif %}
+        </div>
+        <div style="flex:1">
+          <div class="notif-title">{{ n.title }}</div>
+          <div class="notif-msg">{{ n.message }}</div>
+          <div class="notif-time">{{ n.created_at|timesince }} ago</div>
+          {% if n.related_url %}<a href="{{ n.related_url }}" style="font-size:.78rem;color:#4a7c5f;font-weight:600;margin-top:4px;display:inline-block">View →</a>{% endif %}
+        </div>
+        {% if not n.is_read %}<div style="width:8px;height:8px;border-radius:50%;background:#4a7c5f;flex-shrink:0;margin-top:4px"></div>{% endif %}
+      </div>
+      {% endfor %}
+      {% else %}
+      <div style="text-align:center;padding:40px;color:#888">
+        <i class="fas fa-bell" style="font-size:2.5rem;opacity:.3;display:block;margin-bottom:12px"></i>
+        No notifications yet
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

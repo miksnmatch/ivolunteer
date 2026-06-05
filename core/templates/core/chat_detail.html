@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}Chat with {{ partner.get_full_name }}{% endblock %}
+{% block page_title %}Messages{% endblock %}
+{% block content %}
+<div class="chat-layout">
+  <div class="chat-list">
+    <div class="chat-list-header">Messages</div>
+    <a href="{% url 'chat_detail' partner.pk %}" class="chat-item active">
+      <div class="chat-av">{{ partner.first_name|first|upper }}</div>
+      <div><div class="chat-name">{{ partner.get_full_name|default:partner.username }}</div><div class="chat-preview">{{ partner.get_role_display }}</div></div>
+    </a>
+  </div>
+  <div class="chat-main">
+    <div class="chat-header">
+      <div class="chat-av" style="width:32px;height:32px;font-size:.75rem">{{ partner.first_name|first|upper }}</div>
+      {{ partner.get_full_name|default:partner.username }}
+      <span style="font-size:.72rem;color:#888;font-weight:400">{{ partner.get_role_display }}</span>
+    </div>
+    <div class="chat-msgs" id="msgs">
+      {% for msg in messages %}
+      <div>
+        <div class="msg {% if msg.sender == request.user %}msg-sent{% else %}msg-recv{% endif %}">
+          {{ msg.content }}
+          <div class="msg-time">{{ msg.created_at|date:"H:i" }}</div>
+        </div>
+      </div>
+      {% empty %}
+      <div style="text-align:center;color:#888;font-size:.83rem;margin-top:40px">Start the conversation!</div>
+      {% endfor %}
+    </div>
+    <div class="chat-input-area">
+      <form method="post" style="display:flex;gap:10px;width:100%">
+        {% csrf_token %}
+        <input type="text" name="content" class="chat-input" placeholder="Type a message…" autocomplete="off" required>
+        <button type="submit" class="btn btn-green"><i class="fas fa-paper-plane"></i></button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>const m=document.getElementById('msgs');if(m)m.scrollTop=m.scrollHeight;</script>
+{% endblock %}

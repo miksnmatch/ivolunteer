@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+{% block title %}Report Volunteer{% endblock %}
+{% block page_title %}Report Volunteer{% endblock %}
+{% block content %}
+<div style="max-width:500px">
+  <div class="card">
+    <div class="card-body">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="width:52px;height:52px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin:0 auto 12px"><i class="fas fa-flag"></i></div>
+        <h2 style="font-size:1.1rem;font-weight:800">Report Volunteer</h2>
+        <p style="color:#888;font-size:.83rem;margin-top:4px">{{ target.get_full_name }}</p>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group"><label class="form-label">Reason</label>
+          <select name="reason" class="form-control" required>
+            <option value="">Select reason…</option>
+            {% for val,label in reasons %}<option value="{{ val }}">{{ label }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="4" placeholder="Describe the incident…"></textarea></div>
+        <div style="display:flex;gap:10px">
+          <button type="submit" class="btn btn-danger"><i class="fas fa-flag"></i> Submit Report</button>
+          <a href="{% url 'org_dashboard' %}" class="btn btn-grey">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

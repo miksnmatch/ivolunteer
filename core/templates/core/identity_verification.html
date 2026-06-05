@@ -1,0 +1,49 @@
+{% extends 'core/base.html' %}
+{% block title %}Identity Verification{% endblock %}
+{% block page_title %}Identity Verification{% endblock %}
+{% block content %}
+<div style="max-width:600px">
+  <div class="card">
+    <div class="card-body">
+      <div style="text-align:center;padding:20px 0 28px">
+        <div style="width:64px;height:64px;border-radius:50%;background:#e8f5ee;color:#4a7c5f;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 16px"><i class="fas fa-id-card"></i></div>
+        <h2 style="font-size:1.2rem;font-weight:800">Identity Verification</h2>
+        <p style="color:#888;font-size:.875rem;margin-top:6px;max-width:380px;margin-left:auto;margin-right:auto">Submit a valid government-issued ID to verify your identity and gain a verified badge.</p>
+      </div>
+
+      {% if existing %}
+      <div class="alert alert-{% if existing.status == 'approved' %}success{% elif existing.status == 'rejected' %}error{% else %}info{% endif %}" style="margin-bottom:20px">
+        <i class="fas fa-{% if existing.status == 'approved' %}check-circle{% elif existing.status == 'rejected' %}times-circle{% else %}clock{% endif %}"></i>
+        <span>
+          {% if existing.status == 'approved' %}Your identity is verified! ✓
+          {% elif existing.status == 'rejected' %}Your verification was rejected. Please resubmit.
+          {% else %}Verification submitted on {{ existing.submitted_at|date:"M d, Y" }}. Currently under review.{% endif %}
+        </span>
+      </div>
+      {% endif %}
+
+      {% if not existing or existing.status == 'rejected' %}
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label">ID Type</label>
+          <select name="id_type" class="form-control" required>
+            <option value="">Select ID type…</option>
+            <option value="drivers_license">Driver's License</option>
+            <option value="passport">Passport</option>
+            <option value="national_id">National ID (PhilSys)</option>
+            <option value="other">Other Government ID</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Upload ID Document</label>
+          <input type="file" name="id_document" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+          <div style="font-size:.72rem;color:#888;margin-top:4px">Clear photo or scan. JPG, PNG, PDF accepted (max 5MB)</div>
+        </div>
+        <button type="submit" class="btn btn-green btn-lg btn-block"><i class="fas fa-upload"></i> Submit for Verification</button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

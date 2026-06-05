@@ -1,0 +1,124 @@
+{% extends 'core/base.html' %}
+{% block title %}My Profile — iVolunteer{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="profile-hero">
+  <div class="profile-avatar-lg">
+    {% if request.user.profile_picture %}<img src="{{ request.user.profile_picture.url }}" alt="">
+    {% else %}{{ request.user.first_name|first|upper }}{{ request.user.last_name|first|upper }}{% endif %}
+  </div>
+  <div style="flex:1">
+    <div class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+    <div class="profile-email">{{ request.user.email }}</div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      {% if request.user.is_verified %}
+      <span class="profile-tag"><i class="fas fa-check-circle"></i> Verified</span>
+      {% else %}
+      <a href="{% url 'identity_verification' %}" class="profile-tag" style="background:rgba(255,255,255,.2)"><i class="fas fa-shield-alt"></i> Verify Identity</a>
+      {% endif %}
+      {% if request.user.location %}<span class="profile-tag"><i class="fas fa-map-marker-alt"></i> {{ request.user.location }}</span>{% endif %}
+    </div>
+  </div>
+  <div style="display:flex;gap:32px;text-align:center">
+    <div><div style="font-size:1.8rem;font-weight:800">{{ profile.total_projects }}</div><div style="font-size:.78rem;opacity:.8">Projects</div></div>
+    <div><div style="font-size:1.8rem;font-weight:800">{{ profile.total_hours }}</div><div style="font-size:.78rem;opacity:.8">Hours</div></div>
+    <div><div style="font-size:1.8rem;font-weight:800">{{ profile.rating|floatformat:1 }}</div><div style="font-size:.78rem;opacity:.8">Rating</div></div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 320px;gap:24px">
+  <div>
+    <!-- Edit Profile -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:18px;font-size:1rem">Edit Profile</h3>
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">First Name</label><input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}"></div>
+            <div class="form-group"><label class="form-label">Last Name</label><input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Phone</label><input type="tel" name="phone" class="form-control" value="{{ request.user.phone_number }}"></div>
+            <div class="form-group"><label class="form-label">Location</label><input type="text" name="location" class="form-control" value="{{ request.user.location }}"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Bio</label><textarea name="bio" class="form-control">{{ profile.bio }}</textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Skills <span style="color:#888;font-weight:400">(comma-separated)</span></label><input type="text" name="skills" class="form-control" value="{{ profile.skills }}"></div>
+            <div class="form-group"><label class="form-label">Interests <span style="color:#888;font-weight:400">(comma-separated)</span></label><input type="text" name="interests" class="form-control" value="{{ profile.interests }}"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Time Availability</label><input type="text" name="time_available" class="form-control" value="{{ profile.time_available }}" placeholder="e.g., Weekends"></div>
+          <div class="form-group"><label class="form-label">Profile Picture</label><input type="file" name="profile_picture" class="form-control" accept="image/*"></div>
+          <button type="submit" class="btn btn-green"><i class="fas fa-save"></i> Save Changes</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Completed Projects -->
+    {% if completed %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:14px;font-size:1rem">Completed Volunteering</h3>
+        {% for app in completed %}
+        <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid #e5e5e5">
+          <div style="width:40px;height:40px;border-radius:8px;background:#e8f5ee;display:flex;align-items:center;justify-content:center;font-size:1.1rem">✅</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.875rem">{{ app.opportunity.title }}</div>
+            <div style="font-size:.75rem;color:#888">{{ app.opportunity.organization.name }} · {{ app.opportunity.date }}</div>
+          </div>
+          {% if app.completion_rating %}
+          <div style="color:#f0a500;font-size:.9rem">{% for i in "12345" %}{% if forloop.counter <= app.completion_rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div>
+    <!-- Certificates -->
+    {% if certs %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:12px;font-size:.95rem">My Certificates</h3>
+        {% for cert in certs %}
+        <a href="{% url 'view_certificate' cert.pk %}" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #e5e5e5;color:inherit">
+          <div style="width:38px;height:38px;border-radius:50%;background:#2d5a3d;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0"><i class="fas fa-certificate"></i></div>
+          <div><div style="font-weight:600;font-size:.83rem">{{ cert.template_title }}</div><div style="font-size:.72rem;color:#888">{{ cert.issued_at|date:"M d, Y" }}</div></div>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Achievements -->
+    {% if achievements %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:12px;font-size:.95rem">Achievements</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          {% for ua in achievements %}
+          <div style="text-align:center;padding:12px;border:1px solid #e5e5e5;border-radius:10px;width:80px" title="{{ ua.achievement.description }}">
+            <div style="font-size:1.5rem">{{ ua.achievement.icon }}</div>
+            <div style="font-size:.65rem;font-weight:600;margin-top:4px;color:#555">{{ ua.achievement.name }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick links -->
+    <div class="card">
+      <div class="card-body">
+        <h3 style="font-weight:700;margin-bottom:12px;font-size:.95rem">Quick Links</h3>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <a href="{% url 'identity_verification' %}" class="btn btn-outline-green btn-block btn-sm"><i class="fas fa-id-card"></i> Identity Verification</a>
+          <a href="{% url 'my_applications' %}" class="btn btn-grey btn-block btn-sm"><i class="fas fa-clipboard-list"></i> My Applications</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

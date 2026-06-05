@@ -1,0 +1,78 @@
+{% extends 'core/base.html' %}
+{% block title %}Applicant — {{ app.full_name }}{% endblock %}
+{% block page_title %}Applicant Detail{% endblock %}
+{% block content %}
+<div style="margin-bottom:12px"><a href="{% url 'org_applicants' app.opportunity.pk %}" style="color:#4a7c5f;font-size:.85rem"><i class="fas fa-arrow-left"></i> Back to Applicants</a></div>
+<div style="display:grid;grid-template-columns:1fr 300px;gap:24px">
+  <div>
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+          <div style="width:64px;height:64px;border-radius:50%;background:#4a7c5f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;overflow:hidden;flex-shrink:0">
+            {% if app.volunteer.profile_picture %}<img src="{{ app.volunteer.profile_picture.url }}" alt="" style="width:100%;height:100%;object-fit:cover">{% else %}{{ app.full_name|first|upper }}{% endif %}
+          </div>
+          <div>
+            <h2 style="font-size:1.2rem;font-weight:800">{{ app.full_name }}</h2>
+            <div style="font-size:.83rem;color:#888;margin-top:2px">{{ app.email }} · {{ app.phone }}</div>
+            <span class="badge badge-{{ app.status }}" style="margin-top:6px">{{ app.get_status_display }}</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;font-size:.85rem">
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Applied</div><div style="margin-top:3px;font-weight:500">{{ app.applied_at|date:"M d, Y" }}</div></div>
+          <div><div style="color:#888;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em">Experience</div><div style="margin-top:3px;font-weight:500">{% if app.has_previous_experience %}Yes{% else %}No{% endif %}</div></div>
+        </div>
+        {% if app.motivation %}
+        <div style="background:#f8faf8;border-radius:8px;padding:14px;margin-bottom:16px">
+          <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:6px">Motivation</div>
+          <div style="font-size:.875rem;color:#555;line-height:1.6">{{ app.motivation }}</div>
+        </div>
+        {% endif %}
+        {% if app.status == 'pending' %}
+        <form method="post" style="display:flex;gap:10px">
+          {% csrf_token %}
+          <button name="action" value="approve" class="btn btn-green btn-lg"><i class="fas fa-check"></i> Approve</button>
+          <button name="action" value="reject" class="btn btn-danger btn-lg"><i class="fas fa-times"></i> Reject</button>
+        </form>
+        {% elif app.status == 'approved' %}
+        <form method="post" style="display:flex;gap:10px">
+          {% csrf_token %}
+          <button name="action" value="complete" class="btn btn-green btn-lg"><i class="fas fa-flag-checkered"></i> Mark Completed</button>
+          <a href="{% url 'rate_volunteer' app.pk %}" class="btn btn-outline-green btn-lg"><i class="fas fa-star"></i> Rate Volunteer</a>
+        </form>
+        {% elif app.status == 'completed' %}
+        <div class="alert alert-success" style="margin:0"><i class="fas fa-check-circle"></i> This volunteer has completed the activity.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div>
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="font-weight:700;margin-bottom:12px;font-size:.9rem">Opportunity</div>
+        <div style="font-size:.875rem;font-weight:600">{{ app.opportunity.title }}</div>
+        <div style="font-size:.78rem;color:#888;margin-top:4px"><i class="fas fa-calendar" style="color:#4a7c5f"></i> {{ app.opportunity.date }}</div>
+        <div style="font-size:.78rem;color:#888;margin-top:3px"><i class="fas fa-map-marker-alt" style="color:#4a7c5f"></i> {{ app.opportunity.location }}</div>
+      </div>
+    </div>
+    {% with vp=app.volunteer.volunteer_profile %}
+    {% if vp %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <div style="font-weight:700;margin-bottom:12px;font-size:.9rem">Volunteer Stats</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="text-align:center;padding:10px;background:#f8faf8;border-radius:8px"><div style="font-weight:700;color:#4a7c5f">{{ vp.total_projects }}</div><div style="font-size:.7rem;color:#888">Projects</div></div>
+          <div style="text-align:center;padding:10px;background:#f8faf8;border-radius:8px"><div style="font-weight:700;color:#4a7c5f">{{ vp.rating|floatformat:1 }}</div><div style="font-size:.7rem;color:#888">Rating</div></div>
+        </div>
+        {% if vp.skills %}<div style="margin-top:10px"><div style="font-size:.72rem;color:#888;font-weight:600;margin-bottom:5px">Skills</div>{% for s in vp.skills_list %}<span class="tag">{{ s }}</span>{% endfor %}</div>{% endif %}
+      </div>
+    </div>
+    {% endif %}
+    {% endwith %}
+    <div class="card">
+      <div class="card-body">
+        <a href="{% url 'report_volunteer' app.volunteer.pk %}" class="btn btn-danger btn-sm btn-block"><i class="fas fa-flag"></i> Report Volunteer</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
